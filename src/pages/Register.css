@@ -1,0 +1,74 @@
+/* Apply styles for screens below laptop size (e.g., tablets and mobiles) */
+@media (max-width: 1023px) {
+  .register-container {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    height: auto;
+  }
+
+  .register-form-wrapper {
+    width: 90%;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+
+  .register-title {
+    font-size: 1.75rem;
+    text-align: center;
+  }
+
+  .register-button {
+    font-size: 1rem;
+    width: 100%;
+  }
+
+  .terms-checkbox {
+    font-size: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .register-bg {
+    background-image: none;
+  }
+
+  .hideAutoFirPro{
+    display:none
+  }
+
+}
+
+@media (min-width: 1024px) {
+
+  .hide-register-logo{
+    display: none;
+  }
+  .hide-register-bg{
+    background-image: url('../assets/images/registerBg_cleanup.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-position: top left;
+  }
+}
+
+/* for login page */
+@media (max-width: 1024px) { /* laptop screen size or below */
+  .login-page-bg {
+    background: none !important;
+  }
+
+  .login-page-container {
+    justify-content: center !important;
+    padding: 20px !important;
+    gap: 0 !important;
+  }
+
+  .login-form-box {
+    width: 90% !important;
+    max-width: 400px !important;
+  }
+
+  .bottom-logo {
+    display: none !important;
+  }
+}
