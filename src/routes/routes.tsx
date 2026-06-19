@@ -32,6 +32,9 @@ import AuthCallback from "../Redux/features/authCallbackTemu";
 import MigrationDetailsPage from "../pages/MigrationDetailsPage";
 import MigrationJobDetails from "../pages/MigrationJobDetails";
 import ErrorPage from "../pages/ErrorPage";
+import VerifyEmail from "../pages/VerifyEmail";
+import ResetPassword from "../pages/ResetPassword";
+import NotFound from "../pages/NotFound";
 
 const router = createBrowserRouter([
 	{
@@ -53,6 +56,14 @@ const router = createBrowserRouter([
 	{
 		path: "/register",
 		element: <Register />,
+	},
+	{
+		path: "/verify-email",
+		element: <VerifyEmail />,
+	},
+	{
+		path: "/reset-password",
+		element: <ResetPassword />,
 	},
 	{
 		path: "/forget-password",
@@ -259,7 +270,11 @@ const router = createBrowserRouter([
 	{
   path: "/auth/callback",
   element: <AuthCallback />,
-}
+},
+	{
+		path: "*",
+		element: <NotFound />,
+	}
 ]);
 
 export default router;
