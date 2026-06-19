@@ -12,7 +12,6 @@ import { createBrowserRouter } from "react-router-dom";
 import EbaySearchReport from "../pages/EbaySearchReport";
 import EbaySearchHistory from "../pages/EbaySearchHistory";
 import CategoryDetails from "../components/CategoryDetails";
-import LandingPage from "../pages/LandingPage";
 import SalesInsights from "../pages/SalesInsights";
 import RegisterEbay from "../pages/RegisterEbay";
 import CommunicationHub from "../pages/CommunicationHub";
@@ -41,7 +40,7 @@ const router = createBrowserRouter([
 	},
 	{
 		path: '/',
-		element: <LandingPage />
+		element: <Register />
 	  },
 	{
 		path: "/login",

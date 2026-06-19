@@ -2,15 +2,11 @@
 import * as React from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import Modal from "react-modal";
-import Input from "../components/input/Input";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { useSigninMutation } from "../Redux/features/auth/authApi";
 import { setAccessToken } from "../Redux/features/auth/authSlice";
 import { useAppDispatch } from "../Redux/hooks";
-import Register from "./Register";
-import LoginPage from "../assets/images/LoginPage_cleanup.png";
-import CloseIcon from "../assets/icons/CloseIcon";
 import {
   Box,
   Dialog,
@@ -23,34 +19,15 @@ import {
   ListItemText,
   ListItemButton,
 } from "@mui/material";
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import ForgotPasswordModal from "./ForgotPasswordModal ";
-import autofitPowered from "../assets/images/autofitpowered.png"
-// import { connectTemu } from "../services/temuService";
-// Modal.setAppElement('#root');
-
-const customStyles = {
-  overlay: {
-    zIndex: 1000,
-    backgroundColor: "rgba(0, 0, 0, 0.7)", // Optional, dark background behind modal
-  },
-  content: {
-    zIndex: 1001,
-    borderRadius: "10px",
-    // padding: '20px',
-    // height: '45rem',
-    maxWidth: "75rem",
-    margin: "auto",
-    overflow: "hidden",
-  },
-};
 
 interface Seller {
   userId: number;
   sellerName: string;
   email: string;
 }
+
+const features = ["End-to-end encryption", "99.9% uptime", "Real-time mapping"];
 
 const Login = () => {
   const [loginInfo, setLoginInfo] = useState({
@@ -60,7 +37,6 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [signIn, { isLoading }] = useSigninMutation();
-  const [modalIsOpen, setIsOpen] = useState(false);
   const [sellerDialogOpen, setSellerDialogOpen] = useState(false);
   const [sellerList, setSellerList] = useState<Seller[]>([]);
   const [selectedUserIds, setSelectedUserIds] = useState<number | null>(null);
@@ -68,50 +44,7 @@ const Login = () => {
   const [openResetPasswordModal, setOpenResetPasswordModal] = useState(false);
   const [loginResult, setLoginResult] = useState<any>(null);
 
-  function openModal() {
-    setIsOpen(true);
-  }
-
-  function closeModal() {
-    setIsOpen(false);
-  }
-
-  // working code
-  // const handleSubmit = async (e: React.FormEvent) => {
-
-  //   e.preventDefault();
-
-  //   if (!loginInfo.username) {
-  //     toast.error("eMail can't be empty.");
-  //     return;
-  //   }
-
-  //   if (!loginInfo.password) {
-  //     toast.error("Password can't be empty.");
-  //     return;
-  //   }
-
-  //   try {
-  //     const result = await signIn(loginInfo).unwrap();
-  //     console.log(result)
-  //     if (result) {
-  //       localStorage.setItem("userName", loginInfo.username);
-  //       localStorage.setItem("isAdmin", JSON.stringify(result.admin));
-
-  //       toast.success("Logged in successfully.");
-  //       dispatch(setAccessToken(result));
-  //       navigate("/"); // Redirect to dashboard or another page
-  //     }
-  //   } catch (err: any) {
-  //     toast.error(err.message || "Login failed");
-  //     // console.log(err.message || "Login failed");
-
-  //   }
-  // };
-
-  //  new code
   const handleSubmit = async (e: React.FormEvent) => {
-    // debugger;
     e.preventDefault();
 
     const { username, password } = loginInfo;
@@ -119,54 +52,30 @@ const Login = () => {
     if (!password) return toast.error("Password can't be empty.");
 
     try {
-      let result = await signIn(loginInfo).unwrap();
-      setLoginResult(result); 
-
-      console.log("Login Result:", result);
+      const result = await signIn(loginInfo).unwrap();
+      setLoginResult(result);
 
       if (result.admin && !username.includes("/")) {
         const sellers = await fetchSellers(result.accessToken);
         if (sellers.length > 0) {
           setSellerList(sellers);
-
           setSellerDialogOpen(true);
         }
         localStorage.setItem("isAdmin", String(result.admin));
-      }  else {
+      } else {
         handlePostLogin(username, result);
       }
     } catch (err: any) {
       toast.error(err.message || "Login failed");
-      // console.log(err,'login fild')
     }
   };
 
-//  const handleConnectTemu = async () => {
-//   try {
-//     const res: any = await connectTemu();
-
-//     console.log("FULL RESPONSE:", res);
-
-//     // 👇 TEMP SAFE CHECK
-//     if (!res || !res.url) {
-//       console.error("URL not found in response", res);
-//       return;
-//     }
-
-//     window.location.href = res.authUrl;
-
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
-
   const handlePostLogin = (username: string, result: any) => {
-    // debugger;
     localStorage.setItem("userName", username);
     localStorage.setItem("isAdmin", String(result.admin));
     dispatch(setAccessToken(result));
     toast.success("Logged in successfully.");
-    navigate("/dashboard"); // Redirect to dashboard
+    navigate("/dashboard");
   };
 
   const fetchSellers = async (token: string) => {
@@ -188,7 +97,6 @@ const Login = () => {
   };
 
   const handleSellerConfirm = async () => {
-    // debugger;
     const selectedSellers = sellerList.find(
       (s) => s.userId === selectedUserIds
     );
@@ -206,9 +114,7 @@ const Login = () => {
       }).unwrap();
 
       setSellerDialogOpen(false);
-
       handlePostLogin(modifiedUsername, result);
-
       toast.success(`Logged in as ${selectedSellers.sellerName}`);
     } catch (error: any) {
       toast.error("Login failed. Please try again.");
@@ -216,209 +122,179 @@ const Login = () => {
   };
 
   const handleForgotPassword = () => {
-    setOpenResetPasswordModal(true); // This will open the ForgotPasswordModal
+    setOpenResetPasswordModal(true);
   };
 
   const handleAdminContinue = () => {
-    // debugger;
-  if (!loginInfo.username || !loginInfo.password) {
-    toast.error("Missing login info.");
-    return;
-  }
+    if (!loginInfo.username || !loginInfo.password) {
+      toast.error("Missing login info.");
+      return;
+    }
 
+    if (!loginResult) {
+      toast.error("Session expired. Please login again.");
+      navigate("/login");
+      return;
+    }
 
-  if (!loginResult) {
-    toast.error("Session expired. Please login again.");
-    navigate("/login");
-    return;
-  }
+    handlePostLogin(loginInfo.username, loginResult);
+    setSellerDialogOpen(false);
+  };
 
-  handlePostLogin(loginInfo.username, loginResult);
-  setSellerDialogOpen(false);
-};
-
+  const inputClass =
+    "w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 py-2.5 text-[15px] text-[#0F172A] placeholder:text-[#94A3B8] outline-none transition focus:border-[#1D4ED8] focus:bg-white focus:ring-2 focus:ring-[#1D4ED8]/15";
+  const labelClass = "mb-1.5 block text-[13px] font-medium text-[#334155]";
 
   return (
-    <div
-      style={{
-        background: `url(${LoginPage})`,
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "100% 100%",
-      }}
-      className="login-page-bg w-full h-screen flex items-center p-[50px] gap-[250px] justify-between bg-[#F3F3F3] relative overflow-hidden z-10"
-    >
-      <div className="absolute bottom-4 right-4 z-30 bottom-logo">
-  <img
-    src={autofitPowered}
-    alt="bottomLogo"
-    className="w-[400px] h-auto object-contain"
-  />
-</div>
-      <div
-        style={{
-          backgroundColor: "white",
-          borderRadius: "1rem",
-        }}
-        className="login-form-box flex m-8 flex-col p-12 items-center justify-between  w-1/3 border-2 border-r-6"
-      >
-        {/* <Link to="/" className="text-black font-rajdhani text-[40px] font-bold">
-          e-motiv
-        </Link> */}
+    <div className="min-h-screen w-full bg-gradient-to-br from-[#F4F7FF] via-[#F7F9FE] to-[#E9F0FE] font-poppins">
+      <div className="mx-auto flex min-h-screen max-w-[1280px] flex-col items-center justify-center gap-12 px-6 py-10 lg:flex-row lg:gap-16 lg:px-10">
+        {/* Left: marketing */}
+        <div className="w-full max-w-[560px]">
+          <h2 className="mb-10 text-xl font-bold text-[#1D4ED8]">eBay2Temu</h2>
 
-        <form 
-        onSubmit={handleSubmit}
-        >
-          <div className="flex flex-col gap-4">
-            <h1 className="titleBG text-4xl font-bold">Login</h1>
-            <h6 className="mb-0">
-              Don't have an account?{" "}
-              <button
-                // to={"/register"}
-                type="button"
-                onClick={openModal}
-                className="font-rajdhani text-blue-500 font-semibold"
-              >
-                Create your account
-              </button>
-              , It takes <br /> less than a minute{" "}
-            </h6>
+          <h1 className="text-[44px] font-extrabold leading-[1.1] tracking-tight text-[#0F172A] sm:text-[52px]">
+            Migrate Your eBay Listings to TEMU in Minutes
+          </h1>
 
+          <p className="mt-6 max-w-[520px] text-[17px] leading-relaxed text-[#475569]">
+            Join thousands of high-volume sellers expanding their reach. Our
+            secure, API-driven platform ensures your data transfers with
+            absolute precision.
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-3">
+            {features.map((feature) => (
+              <div key={feature} className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-[#1D4ED8]" />
+                <span className="text-[15px] text-[#334155]">{feature}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: login card */}
+        <div className="w-full max-w-[520px] rounded-2xl border border-[#E5E7EB] bg-white p-8 shadow-[0_10px_40px_-12px_rgba(15,23,42,0.12)] sm:p-10">
+          <h2 className="text-[30px] font-bold text-[#0F172A]">Welcome back</h2>
+          <p className="mt-1.5 text-[15px] text-[#64748B]">
+            Log in to continue your migration.
+          </p>
+
+          <form onSubmit={handleSubmit} className="mt-7 space-y-5">
             <div>
-              <Input
-                id="username"
-                name="username"
-                placeholder="Email Address"
-                value={loginInfo?.username}
-                onChange={(newValue) =>
-                  setLoginInfo({
-                    ...loginInfo,
-                    username: newValue,
-                  })
-                }
+              <label className={labelClass}>Work Email</label>
+              <input
                 type="text"
-                className="p-2 w-full border-[#EE7178]"
+                value={loginInfo.username}
+                onChange={(e) =>
+                  setLoginInfo({ ...loginInfo, username: e.target.value })
+                }
+                placeholder="jane@acmecorp.com"
+                className={inputClass}
               />
             </div>
-            <div className="relative">
-      <Input
-        id="password"
-        name="password"
-        placeholder="Password"
-        value={loginInfo.password}
-        onChange={(newValue: string) =>
-          setLoginInfo({
-            ...loginInfo,
-            password: newValue,
-          })
-        }
-        type={showPassword ? "text" : "password"}
-        className="p-2 w-full border-[#EE7178]"
-      />
-      <button
-        type="button"
-        onClick={() => setShowPassword((prev) => !prev)}
-        className="absolute right-2 top-1/2 -translate-y-1/2 text-sm"
-      >
-        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon /> }
-      </button>
 
- 
-</div>
-<div className="text-right text-sm text-blue-500 underline cursor-pointer mt-1 mb-4">
-  <button type="button" 
-  onClick={handleForgotPassword}
-  >
-    Forgot password?
-  </button>
-    </div>
+            <div>
+              <label className={labelClass}>Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={loginInfo.password}
+                  onChange={(e) =>
+                    setLoginInfo({ ...loginInfo, password: e.target.value })
+                  }
+                  placeholder="••••••••"
+                  className={`${inputClass} pr-10`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] transition hover:text-[#475569]"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-[18px] w-[18px]" />
+                  ) : (
+                    <Eye className="h-[18px] w-[18px]" />
+                  )}
+                </button>
+              </div>
+            </div>
 
-    
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                className="text-[13px] font-medium text-[#1D4ED8] hover:underline"
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full rounded-lg bg-[#1D4ED8] py-3 text-[15px] font-semibold text-white transition hover:bg-[#1A45BE] disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isLoading ? "Signing in..." : "Sign In"}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-[15px] text-[#64748B]">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="font-semibold text-[#1D4ED8] hover:underline"
+            >
+              Create your account
+            </Link>
+          </p>
+        </div>
+      </div>
+
       {/* Forgot password modal */}
       <ForgotPasswordModal
         open={openResetPasswordModal}
         onClose={() => setOpenResetPasswordModal(false)}
       />
 
-            <div>
-              <div className="flex items-center mb-6 mt-6">
-              
-              </div>
-
-              <button
-                type="submit"
-                className="bg-[#ED1F24] px-2 py-2  text-white rounded-[30px] min-w-[160px] font-rajdhani text-xl font-medium"
-              >
-                {isLoading ? "Logging in..." : "Login"}
-              </button>
-
-  
-            </div>
-          </div>
-        </form>
-      </div>
-
-    
-      <div>
-        <Modal
-          isOpen={modalIsOpen}
-          // onAfterOpen={afterOpenModal}
-          onRequestClose={closeModal}
-          // contentLabel="Example Modal"
-          style={customStyles}
-        >
-          <div className="flex flex-col items-end justify-center h-full">
-            <button onClick={closeModal} className="text-red-500">
-              <CloseIcon />
-            </button>
-            <Register />
-          </div>
-        </Modal>
-      </div>
-
-      {/* new modal for seller lists */}
-      <div>
-        <Dialog
-          open={sellerDialogOpen}
-          onClose={() => setSellerDialogOpen(false)}
-          maxWidth="sm"
-          fullWidth
-        >
-          <DialogTitle>Select a Seller</DialogTitle>
-          <DialogContent>
-            <Box sx={{ maxHeight: 300, overflowY: "auto" }}>
-              <List>
-                {sellerList.map((seller) => (
-                  <ListItem key={seller.userId} disablePadding>
-                    <ListItemButton
-                      selected={selectedUserIds === seller.userId}
-                      // onClick={() => toggleSelection(seller.userId)}
-                      onClick={() => setSelectedUserIds(seller.userId)}
-                    >
-                      <ListItemText
-                        primary={seller.sellerName}
-                        secondary={`${seller.email} (User ID: ${seller.userId})`}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleAdminContinue}>Skip</Button>
-            <Button
-              onClick={handleSellerConfirm}
-              disabled={selectedUserIds === null}
-              variant="contained"
-            >
-              Confirm
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
-
-
-      
+      {/* Seller selection dialog */}
+      <Dialog
+        open={sellerDialogOpen}
+        onClose={() => setSellerDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Select a Seller</DialogTitle>
+        <DialogContent>
+          <Box sx={{ maxHeight: 300, overflowY: "auto" }}>
+            <List>
+              {sellerList.map((seller) => (
+                <ListItem key={seller.userId} disablePadding>
+                  <ListItemButton
+                    selected={selectedUserIds === seller.userId}
+                    onClick={() => setSelectedUserIds(seller.userId)}
+                  >
+                    <ListItemText
+                      primary={seller.sellerName}
+                      secondary={`${seller.email} (User ID: ${seller.userId})`}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleAdminContinue}>Skip</Button>
+          <Button
+            onClick={handleSellerConfirm}
+            disabled={selectedUserIds === null}
+            variant="contained"
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
