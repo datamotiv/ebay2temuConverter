@@ -4,7 +4,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, CheckCircle2 } from "lucide-react";
-import { useSigninMutation } from "../Redux/features/auth/authApi";
+import { useSigninTemuMutation } from "../Redux/features/auth/temuAuthApi";
 import { setAccessToken } from "../Redux/features/auth/authSlice";
 import { useAppDispatch } from "../Redux/hooks";
 import {
@@ -36,7 +36,7 @@ const Login = () => {
   });
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [signIn, { isLoading }] = useSigninMutation();
+  const [signIn, { isLoading }] = useSigninTemuMutation();
   const [sellerDialogOpen, setSellerDialogOpen] = useState(false);
   const [sellerList, setSellerList] = useState<Seller[]>([]);
   const [selectedUserIds, setSelectedUserIds] = useState<number | null>(null);
@@ -52,7 +52,7 @@ const Login = () => {
     if (!password) return toast.error("Password can't be empty.");
 
     try {
-      const result = await signIn(loginInfo).unwrap();
+      const result = await signIn({ email: username, password }).unwrap();
       setLoginResult(result);
 
       if (result.admin && !username.includes("/")) {
@@ -66,7 +66,7 @@ const Login = () => {
         handlePostLogin(username, result);
       }
     } catch (err: any) {
-      toast.error(err.message || "Login failed");
+      toast.error(err?.data?.message || err.message || "Login failed");
     }
   };
 
@@ -109,7 +109,7 @@ const Login = () => {
     try {
       const modifiedUsername = `${loginInfo.username}/${selectedSellers.userId}`;
       const result = await signIn({
-        username: modifiedUsername,
+        email: modifiedUsername,
         password: loginInfo.password,
       }).unwrap();
 
