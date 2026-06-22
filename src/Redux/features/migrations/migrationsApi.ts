@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 // so routes are referenced as /v1/... (matches the working accounts/summary call).
 export const migrationsApi = createApi({
   reducerPath: "ebay2temuMigrations",
-  tagTypes: ["Migrations", "MigrationItems"],
+  tagTypes: ["Migrations", "MigrationItems", "ShippingTemplate"],
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_LOCAL_TEMU_BASE_URL,
     prepareHeaders: (headers) => {
@@ -91,6 +91,27 @@ export const migrationsApi = createApi({
       }),
       invalidatesTags: ["Migrations", "MigrationItems"],
     }),
+
+    // GET /v1/shipping-template — TEMU shipping templates + current selection.
+    shippingTemplates: builder.query<
+      {
+        templates: { templateId: string; templateName: string }[];
+        selectedShippingTemplate?: { templateId: string; templateName: string } | null;
+      },
+      void
+    >({
+      query: () => ({ url: "/v1/shipping-template" }),
+      providesTags: ["ShippingTemplate"],
+    }),
+
+    // PATCH /v1/shipping-template/select/:templateId — set the active template.
+    selectShippingTemplate: builder.mutation<any, { templateId: string }>({
+      query: ({ templateId }) => ({
+        url: `/v1/shipping-template/select/${templateId}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["ShippingTemplate"],
+    }),
   }),
 });
 
@@ -100,4 +121,6 @@ export const {
   useListMigrationsQuery,
   useMigrationItemsQuery,
   useRetryMigrationMutation,
+  useShippingTemplatesQuery,
+  useSelectShippingTemplateMutation,
 } = migrationsApi;

@@ -1,21 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ArrowLeftRight,
-  BarChart3,
   BookOpen,
-  LayoutGrid,
   Link2,
   Plus,
   RefreshCcw,
-  RefreshCw,
   Settings,
   ShoppingBag,
   Store,
-  Wallet,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MigrationReadinessPanel from '../components/dashboard/MigrationReadinessPanel';
+import ShippingTemplateModal from '../components/dashboard/ShippingTemplateModal';
 import WelcomeUser from './WelcomeUser';
 
 type Platform = 'ebay' | 'temu';
@@ -30,12 +27,7 @@ const platformOptions: { label: string; value: Platform }[] = [
   { label: 'Link with Temu Store', value: 'temu' },
 ];
 
-const NAV_ITEMS = [
-  { label: 'Dashboard', Icon: LayoutGrid, key: 'dashboard' },
-  { label: 'Migrations', Icon: ArrowLeftRight, key: 'migrations' },
-  { label: 'Analytics', Icon: BarChart3, key: 'analytics' },
-  { label: 'Billing', Icon: Wallet, key: 'billing' },
-];
+const NAV_ITEMS = [{ label: 'Migrations', Icon: ArrowLeftRight, key: 'migrations' }];
 
 interface Account {
   accountId: number;
@@ -53,6 +45,7 @@ const PROVIDER_CFG: Record<
     iconColor: string;
     role: string;
     defaultName: string;
+    provider: string;
   }
 > = {
   EBAY: {
@@ -61,6 +54,7 @@ const PROVIDER_CFG: Record<
     iconColor: '#1D4ED8',
     role: 'Source Account',
     defaultName: 'eBay Store',
+    provider: 'EBAY',
   },
   TEMU: {
     Icon: ShoppingBag,
@@ -68,6 +62,7 @@ const PROVIDER_CFG: Record<
     iconColor: '#F0533B',
     role: 'Target Account',
     defaultName: 'TEMU Store',
+    provider: 'TEMU',
   },
 };
 
@@ -79,9 +74,18 @@ const FALLBACK_CFG = {
   defaultName: 'Marketplace',
 };
 
-const AccountCard = ({ account, onSync }: { account: Account; onSync: () => void }) => {
+const AccountCard = ({
+  account,
+  onSync,
+  onManage,
+}: {
+  account: Account;
+  onSync: () => void;
+  onManage?: () => void;
+}) => {
   const cfg = PROVIDER_CFG[account.provider?.toUpperCase()] ?? FALLBACK_CFG;
   const isActive = account.status?.toLowerCase() === 'active';
+  const manageDisabled = cfg.provider !== 'TEMU' || !onManage;
 
   return (
     <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
@@ -111,7 +115,15 @@ const AccountCard = ({ account, onSync }: { account: Account; onSync: () => void
       </div>
 
       <div className="mt-5 flex items-center gap-2">
-        <button className="flex-1 rounded-lg border border-[#E2E8F0] bg-white py-2.5 text-[14px] font-semibold text-[#334155] transition hover:bg-[#F8FAFC]">
+        <button
+          onClick={manageDisabled ? undefined : onManage}
+          disabled={manageDisabled}
+          className={`flex-1 rounded-lg border border-[#E2E8F0] py-2.5 text-[14px] font-semibold transition ${
+            manageDisabled
+              ? 'bg-[#F8FAFC] text-[#94A3B8] cursor-not-allowed'
+              : 'bg-white text-[#334155] hover:bg-[#F8FAFC]'
+          }`}
+        >
           Manage
         </button>
         <button
@@ -134,6 +146,7 @@ const Dashboard = () => {
   const [, setLoading] = useState(false);
 
   const [showConnect, setShowConnect] = useState(false);
+  const [shippingModalOpen, setShippingModalOpen] = useState(false);
 
   // New-user onboarding (account-connection flow)
   const [isNewUser, setIsNewUser] = useState(false);
@@ -294,21 +307,22 @@ const Dashboard = () => {
                 </>
               )}
             </div>
-
-            <button
-              onClick={fetchAccountSummary}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#1D4ED8] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#1A45BE]"
-            >
-              <RefreshCw className="h-[18px] w-[18px]" />
-              Run Sync
-            </button>
           </div>
         </div>
 
         {/* Account cards */}
         <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-3">
           {accounts.map((account) => (
-            <AccountCard key={account.accountId} account={account} onSync={fetchAccountSummary} />
+            <AccountCard
+              key={account.accountId}
+              account={account}
+              onSync={fetchAccountSummary}
+              onManage={
+                account.provider?.toUpperCase() === 'TEMU'
+                  ? () => setShippingModalOpen(true)
+                  : undefined
+              }
+            />
           ))}
 
           {/* Add marketplace */}
@@ -329,6 +343,8 @@ const Dashboard = () => {
         {/* eBay listings readiness + migrations workspace */}
         <MigrationReadinessPanel accounts={accounts} />
       </main>
+
+      <ShippingTemplateModal open={shippingModalOpen} onClose={() => setShippingModalOpen(false)} />
 
       {isNewUser && (
         <WelcomeUser
