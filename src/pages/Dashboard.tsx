@@ -1,610 +1,342 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useLocation, useNavigate } from "react-router-dom"; // Import hooks for navigation and state
-import CircularProgressBar from "../components/CircularProgressBar";
-import CircularProgressBarTwo from "../components/CircularProgressBarTwo";
-import Navbar from "../components/Navbar";
-import SummaryFitmentTable from "../components/summaryFitmentTable/summaryFitmentTable";
-import SummaryTable from "../components/summaryTable/SummaryTable";
-// import { registerModal } from "../Redux/features/registerSellerModalSlice";
-import SupportMessage from "../components/SupportMessage"; // Adjust the import path as necessary
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  useSummaryFitmentQuery,
-  useSummaryQuery,
-  useInboxQuery,
-  // useSummaryFitmentDetailsMutation
-} from "../Redux/features/summary/summaryApi";
-import { useAppDispatch, useAppSelector } from "../Redux/hooks";
-// import {   useSelector} from "react-redux";
-import { tableHeaderData } from "../utils/data";
-import DashboardTableTwo from "../components/DashboardTableTwo";
-import Pagination from "../components/Pagination"; // Import Pagination component
-import Tooltip from "@mui/material/Tooltip";
-import InfoIcon from "@mui/icons-material/Info";
-import FitmentScoreChart from "../components/FitmentScoreChart";
-import { setCategoryFitmentScore, setListingOptimizationScore, setSummaryFitmentCategories} from "../Redux/features/fitmentScoreSlice";
-import WelcomeUser from "./WelcomeUser";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import ebayLogo from "../assets/images/ebay-logo.png"
+  ArrowLeftRight,
+  BarChart3,
+  BookOpen,
+  LayoutGrid,
+  Link2,
+  Plus,
+  RefreshCcw,
+  RefreshCw,
+  Settings,
+  ShoppingBag,
+  Store,
+  Wallet,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import MigrationReadinessPanel from '../components/dashboard/MigrationReadinessPanel';
+import WelcomeUser from './WelcomeUser';
+
+type Platform = 'ebay' | 'temu';
+
+const platformUrls: Record<Platform, string> = {
+  ebay: 'https://auth.ebay.com/oauth2/authorize?state=GUID:8258dd0a-e29a-49a4-92dc-35308e7a8df2&client_id=AndrewRo-Emotived-PRD-3786bc793-b1c0583d&response_type=code&redirect_uri=Andrew_Rowson-AndrewRo-Emotiv-hnvajdx&scope=https://api.ebay.com/oauth/api_scope/sell.marketing.readonly%20https://api.ebay.com/oauth/api_scope/sell.marketing%20https://api.ebay.com/oauth/api_scope/sell.inventory.readonly%20https://api.ebay.com/oauth/api_scope/sell.inventory%20https://api.ebay.com/oauth/api_scope/sell.account.readonly%20https://api.ebay.com/oauth/api_scope/sell.account%20https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly%20https://api.ebay.com/oauth/api_scope/sell.fulfillment%20https://api.ebay.com/oauth/api_scope/sell.analytics.readonly%20https://api.ebay.com/oauth/api_scope/sell.finances%20https://api.ebay.com/oauth/api_scope/sell.payment.dispute%20https://api.ebay.com/oauth/api_scope/commerce.identity.readonly&prompt=login',
+  temu: 'https://www.temu.com/login.html',
+};
+
+const platformOptions: { label: string; value: Platform }[] = [
+  { label: 'Link with eBay Store', value: 'ebay' },
+  { label: 'Link with Temu Store', value: 'temu' },
+];
+
+const NAV_ITEMS = [
+  { label: 'Dashboard', Icon: LayoutGrid, key: 'dashboard' },
+  { label: 'Migrations', Icon: ArrowLeftRight, key: 'migrations' },
+  { label: 'Analytics', Icon: BarChart3, key: 'analytics' },
+  { label: 'Billing', Icon: Wallet, key: 'billing' },
+];
+
+interface Account {
+  accountId: number;
+  sellerId: number;
+  provider: string;
+  name: string | null;
+  status: string;
+}
+
+const PROVIDER_CFG: Record<
+  string,
+  {
+    Icon: any;
+    iconBg: string;
+    iconColor: string;
+    role: string;
+    defaultName: string;
+  }
+> = {
+  EBAY: {
+    Icon: Store,
+    iconBg: '#EFF4FF',
+    iconColor: '#1D4ED8',
+    role: 'Source Account',
+    defaultName: 'eBay Store',
+  },
+  TEMU: {
+    Icon: ShoppingBag,
+    iconBg: '#FEF2F2',
+    iconColor: '#F0533B',
+    role: 'Target Account',
+    defaultName: 'TEMU Store',
+  },
+};
+
+const FALLBACK_CFG = {
+  Icon: Store,
+  iconBg: '#F1F5F9',
+  iconColor: '#475569',
+  role: 'Connected Account',
+  defaultName: 'Marketplace',
+};
+
+const AccountCard = ({ account, onSync }: { account: Account; onSync: () => void }) => {
+  const cfg = PROVIDER_CFG[account.provider?.toUpperCase()] ?? FALLBACK_CFG;
+  const isActive = account.status?.toLowerCase() === 'active';
+
+  return (
+    <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          <div
+            className="flex h-11 w-11 items-center justify-center rounded-xl"
+            style={{ backgroundColor: cfg.iconBg }}
+          >
+            <cfg.Icon className="h-5 w-5" style={{ color: cfg.iconColor }} />
+          </div>
+          <div>
+            <h3 className="text-[17px] font-bold text-[#0F172A]">
+              {account.name || cfg.defaultName}
+            </h3>
+            <p className="text-[13px] text-[#64748B]">{cfg.role}</p>
+          </div>
+        </div>
+        <span
+          className={`inline-flex items-center gap-1.5 text-[13px] font-medium ${
+            isActive ? 'text-[#059669]' : 'text-[#94A3B8]'
+          }`}
+        >
+          <span className={`h-2 w-2 rounded-full ${isActive ? 'bg-[#10B981]' : 'bg-[#CBD5E1]'}`} />
+          {isActive ? 'Active' : 'Inactive'}
+        </span>
+      </div>
+
+      <div className="mt-5 flex items-center gap-2">
+        <button className="flex-1 rounded-lg border border-[#E2E8F0] bg-white py-2.5 text-[14px] font-semibold text-[#334155] transition hover:bg-[#F8FAFC]">
+          Manage
+        </button>
+        <button
+          onClick={onSync}
+          aria-label={`Sync ${account.name || cfg.defaultName}`}
+          className="flex h-[42px] w-[42px] items-center justify-center rounded-lg border border-[#E2E8F0] bg-white text-[#475569] transition hover:bg-[#F8FAFC]"
+        >
+          <RefreshCcw className="h-[18px] w-[18px]" />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const Dashboard = () => {
-  const { data: summaryData } = useSummaryQuery({});
-  const { data: inboxData } = useInboxQuery({});
   const navigate = useNavigate();
-  const location = useLocation();
-  const dispatch = useAppDispatch();
-  const { isOpenModal } = useAppSelector((state) => state.paymentModal);
 
-  // Restore `isToggle` from the state or default it to `false`
-  const [isToggle, setIsToggle] = useState(location.state?.isToggle || false);
-  // const [dialName] = useState("Listings");
-  const [, setScore] = useState(summaryData?.score);
-  const [isTableVisible, setIsTableVisible] = useState(true); // Toggle for DashboardTableTwo visibility
-  const [isRepositioned, setIsRepositioned] = useState(false); // Toggle for positioning CircularProgressBarTwo
-  const [listingOpDashboardScore, setListingOpDashboardScore] = useState("");
-  const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [, setError] = useState('');
+  const [, setLoading] = useState(false);
+
+  const [showConnect, setShowConnect] = useState(false);
+
+  // New-user onboarding (account-connection flow)
   const [isNewUser, setIsNewUser] = useState(false);
-    const [, setAccounts] = useState([]);
-  const [, setError] = useState("");
-    const [, setLoading] = useState(false);
-
-
-
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const { data: summaryFitmentData, refetch } = useSummaryFitmentQuery({
-    pageNumber: currentPage,
-    pageSize: 50,
-  });
-  // const isAdmin = localStorage.getItem("isAdmin") === 'true' ? true : false;
-  // console.log(isAdmin)
+  const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
 
   useEffect(() => {
-    const newUser = localStorage.getItem("isNewUser") === "true";
+    const newUser = localStorage.getItem('isNewUser') === 'true';
     if (newUser) {
       setIsNewUser(true);
-      localStorage.removeItem("isNewUser"); // remove after detecting
-    }
-  }, []);
-
-
-  useEffect(() => {
-    // const isNewUser = sessionStorage.getItem("isNewUser");
-    // if (isNewUser) {
       setShowWelcomeDialog(true);
-      // sessionStorage.removeItem("isNewUser"); // Avoid showing again
-    // }
+      localStorage.removeItem('isNewUser');
+    }
   }, []);
-
-  useEffect(() => {
-    if (summaryData) {
-      setScore(summaryData.score);
-    }
-  }, [summaryData]);
-
-  const handleNotSellerDetails = () => {
-    setIsToggle((prev: boolean) => !prev);
-
-    // Pass the updated `isToggle` value in the state when navigating
-    navigate("/fitmentAdoptionSummary", { state: { isToggle: !isToggle } });
-    setIsTableVisible(!isTableVisible); // Toggle DashboardTableTwo visibility
-    setIsRepositioned(!isRepositioned); // Toggle CircularProgressBarTwo position
-  };
-
-
-  // Refresh the data whenever the page number changes
-  useEffect(() => {
-    refetch();
-  }, [currentPage, refetch]);
-
-  // Handle page change for pagination
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-    // You can make API calls or handle pagination logic based on the page number here
-  };
-
-  // new code after UAT
-  const fetchSummaryFitment = async ({
-                                       pageNumber = 1,
-                                       pageSize = 50,
-                                       site = "",
-                                       categoryID = "",
-                                       level = "",
-                                       path = "",
-                                     }) => {
-    try {
-      //  debugger;
-      const numericCategoryID = categoryID?.match(/^\d+/)?.[0] || "";
-
-      if (numericCategoryID == "") {
-        // All selected
-        const numericLevel = parseInt(level) - 1;
-        level = numericLevel.toString();
-      }
-
-      const params = new URLSearchParams({
-        page: pageNumber.toString(),
-        size: pageSize.toString(),
-        site: site || "",
-        categoryID: numericCategoryID || "",
-        path: path || "",
-      });
-
-      if (level !== null && numericCategoryID) {
-        params.append("level", level);
-      }
-
-      const url = `https://api.help-on-time.com/api/datacube/summary/fitment?${params.toString()}`;
-
-      const response = await fetch(url, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const data = await response.json();
-      dispatch(setCategoryFitmentScore(data.fitmentScore));
-
-      if (data.categories) {
-        dispatch(setSummaryFitmentCategories(data.categories));
-      }
-
-      const formattedArray = data.categoryFilter.map((item: string) => {
-        const label = item;
-        const value = item.replace(/[()]/g, '').replace(/\s+/g, '_').replace(/,/g, '');
-        return { label, value };
-      });
-      formattedArray.unshift({ label: "All", value: "" });
-
-      return data;
-    } catch (error) {
-      console.error("Error fetching fitment summary:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchSummaryFitment({
-      pageNumber: 1,
-      pageSize: 50,
-      site: "",
-      categoryID: "",
-      level: "",
-    });
-  }, []);
-
-
-  const fetchListingOptimizationScore = async ({
-    pageNumber = 1,
-    pageSize = 50,
-    site = "",
-    categoryID = "",
-    level = "",
-  }) => {
-    try {
-      //debugger;
-      const numericCategoryID = categoryID?.match(/^\d+/)?.[0] || "";
-
-      const params = new URLSearchParams({
-        page: pageNumber.toString(),
-        size: pageSize.toString(),
-        site: site || "",
-        categoryID: numericCategoryID || "",
-        optimizedListing: "true", 
-      });
-
-      if (level !== null && numericCategoryID) {
-        params.append("level", level);
-      }
-
-      const url = `https://api.help-on-time.com/api/datacube/summary/fitment?${params.toString()}`;
-
-      const response = await fetch(url, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const data = await response.json();
-      setListingOpDashboardScore(data.fitmentScore)
-     dispatch(setListingOptimizationScore(data.fitmentScore))
-      
-      // console.log("Fitment Summary Data:", data);
-      return data;
-    } catch (error) {
-      console.error("Error fetching fitment summary:", error);
-    }
-  };
-  
-  useEffect(() => {
-    //debugger;
-    const fetchData = async () => {
-      await fetchListingOptimizationScore({
-        pageNumber: 1,
-        pageSize: 50,
-        site: "", // 
-        categoryID: "", 
-        // optimizedListing: "true", 
-      });
-    };
-  
-    fetchData();
-  }, []); // Add 
-
 
   const handleLinkEbay = () => {
     setShowWelcomeDialog(false);
-    navigate("/connect-ebay"); // Or your eBay OAuth route
-  };
-type Platform = 'ebay' | 'shopify' | 'temu' | 'allegro';
-
-const handleChange = (event:any) => {
-   const selectedPlatform = event.target.value as Platform;
-
-  const platformUrls = {
-    ebay: 'https://auth.ebay.com/oauth2/authorize?state=GUID:8258dd0a-e29a-49a4-92dc-35308e7a8df2&client_id=AndrewRo-Emotived-PRD-3786bc793-b1c0583d&response_type=code&redirect_uri=Andrew_Rowson-AndrewRo-Emotiv-hnvajdx&scope=https://api.ebay.com/oauth/api_scope/sell.marketing.readonly%20https://api.ebay.com/oauth/api_scope/sell.marketing%20https://api.ebay.com/oauth/api_scope/sell.inventory.readonly%20https://api.ebay.com/oauth/api_scope/sell.inventory%20https://api.ebay.com/oauth/api_scope/sell.account.readonly%20https://api.ebay.com/oauth/api_scope/sell.account%20https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly%20https://api.ebay.com/oauth/api_scope/sell.fulfillment%20https://api.ebay.com/oauth/api_scope/sell.analytics.readonly%20https://api.ebay.com/oauth/api_scope/sell.finances%20https://api.ebay.com/oauth/api_scope/sell.payment.dispute%20https://api.ebay.com/oauth/api_scope/commerce.identity.readonly&prompt=login',
-    shopify: 'https://accounts.shopify.com/store-login',
-    temu: 'https://www.temu.com/login.html',
-    allegro: 'https://allegro.com/log-in'
+    navigate('/connect-ebay');
   };
 
-  const url = platformUrls[selectedPlatform];
+  // Only one TEMU account is allowed; eBay stores can be connected freely.
+  const hasTemu = accounts.some((a) => a.provider?.toUpperCase() === 'TEMU');
 
-  if (url) {
-    window.open(url, '_blank'); // open in a new tab
-  }
-};
+  // Open a marketplace's OAuth/login flow in a new tab.
+  const openPlatform = (platform: Platform) => {
+    if (platform === 'temu' && hasTemu) return;
+    const url = platformUrls[platform];
+    if (url) window.open(url, '_blank');
+    setShowConnect(false);
+  };
 
-// to fetch multiple accounts of single seller
- useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-
-    const fetchAccountSummary = async () => {
-      try {
-        setLoading(true);
-
-        const response = await fetch(
-        `${import.meta.env.VITE_LOCAL_TEMU_BASE_URL}/api/v1/auth/accounts/summary`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch account summary");
-        }
-
-        const data = await response.json();
-
-        console.log("Account data API Response:", data);
-
-        setAccounts(data.accounts || []);
-
-        // Save accounts in localStorage
-localStorage.setItem(
-  "accountsData",
-  JSON.stringify(data.accounts)
-);
-      } catch (err) {
-        if (err instanceof Error) {
-          console.error(err.message);
-          setError(err.message);
-        } else {
-          setError("Something went wrong");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (token) {
-      fetchAccountSummary();
-    } else {
-      setError("Access token not found");
+  // Fetch the seller's connected marketplace accounts.
+  const fetchAccountSummary = async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      setError('Access token not found');
+      return;
     }
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${import.meta.env.VITE_LOCAL_TEMU_BASE_URL}/v1/auth/accounts/summary`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        }
+      );
+      if (!response.ok) throw new Error('Failed to fetch account summary');
+      const data = await response.json();
+      setAccounts(data.accounts || []);
+      localStorage.setItem('accountsData', JSON.stringify(data.accounts));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAccountSummary();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
   return (
-    <div
-      className={isOpenModal ? "overflow-y-hidden" : ""}
-      //  className='overflow-y-hidden'
-    >
-      {/* Navbar Section */}
-      <div className="fixed top-0 left-0 w-full z-50 bg-white shadow-md mb-6 ">
-        <Navbar />
-      </div>
-  
-      <div className="p-[25px] ">
-        <div className="flex gap-[30px] flex-row">
-          {/* Listing Optimization Section */}
-          <div
-            className={`${isToggle ? "flex flex-col gap-4" : "flex flex-row"}`}
-          >
-            <div
-              // className="flex flex-col gap-[30px] w-[270px]"
-              className={`${
-                isToggle ? "hidden" : "flex flex-col gap-[30px] w-[270px]"
-              }`}
-            >
-              <div className="w-full flex gap-[30px]  rounded-[12px] transition-all duration-300 ease-in-out hover:scale-105 ">
-                <div className="flex flex-col w-[250px] items-center">
-                  <div className="border border-borderColor rounded-[15px] p-2.5 flex flex-col h-[350px]">
-                    <p className="text-lg text-center text-[#0F0C22] font-poppins font-medium">
-                      Listing Optimization
-                      <Tooltip title="This identifies and confirms your enhanced eBay listings with strong titles, images, item specifics, and pricing to show you what changes you can make to improve sales">
-                        <InfoIcon style={{ fontSize: 11, color: "grey" }} />
-                      </Tooltip>
-                    </p>
-                    <CircularProgressBar 
-                    percentage={listingOpDashboardScore} 
-                    />
-                    <div className="flex gap-[10px] mt-10 relative top-20 text-center justify-center">
-                      <Link
-                        to="/listingOptimizationSummary"
-                        className="px-5 py-2.5 font-semibold mt-3 bg-[#ED1F24] text-white font-poppins text-xs rounded-[15px]"
-                      >
-                        View Optimization Summary
-                        <Tooltip title="Free - more detailed analysis of your Listing Optimization Score">
-                          <InfoIcon style={{ fontSize: 11 }} />
-                        </Tooltip>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* FITMENT ADOPTION Section */}
-            <div
-              className={`${
-                isToggle ? "flex flex-col w-[260px]" : "flex flex-col w-[270px]"
-              }`}
-            >
-              <div className="border border-borderColor p-2.5 flex flex-col h-[350px]  rounded-[12px] transition-all duration-300 ease-in-out hover:scale-105">
-                <p className="text-lg text-center text-[#0F0C22] font-poppins font-medium ">
-                  Fitment Adoption
-                  <Tooltip title="This identifies and confirms your auto parts listings that specifies compatible vehicle makes, models, and years, as a % of your store">
-                    <InfoIcon style={{ fontSize: 11, color: "grey" }} />
-                  </Tooltip>
-                </p>
-                <CircularProgressBarTwo
-                  percentage={summaryFitmentData?.fitmentScore}
-                />
-                {/* <FitmentScoreChart /> */}
-                <div className="flex gap-[10px] mt-10 relative top-20 text-center justify-center">
-                  <button
-                    onClick={handleNotSellerDetails}
-                    className="px-5 py-2.5 font-semibold mt-3 bg-[#ED1F24] text-white font-poppins text-xs rounded-[15px]"
-                  >
-                    {isToggle ? "View Summary Table" : "View Fitment Summary"}{" "}
-                    <Tooltip
-                      title="Free - more detailed analysis of your Fitment Adoption score
-"
-                    >
-                      <InfoIcon style={{ fontSize: 11 }} />
-                    </Tooltip>
-                  </button>
-                </div>
-              </div>
-
-              {/* fitment score chart */}
-              {isToggle ? (
-                <div className="border  mt-6 border-borderColor p-2.5 flex flex-col h-[300px] rounded-[12px] transition-all duration-300 ease-in-out hover:scale-105">
-                  {/* <p className="text-md text-center text-[#0F0C22] font-poppins font-bold">
-                  FITMENT ADOPTION
-                  <Tooltip title="This identifies and confirms your auto parts listings that specifies compatible vehicle makes, models, and years, as a % of your store">
-                    <InfoIcon style={{ fontSize: 11, color: "grey" }} />
-                  </Tooltip>
-                </p> */}
-                  <FitmentScoreChart />
-                  {/* <div className="flex gap-[10px] mt-10 relative top-20 text-center justify-center">
-                  <button
-                    onClick={handleNotSellerDetails}
-                    className="px-5 py-2.5 font-semibold mt-3 bg-[#ED1F24] text-white font-poppins text-sm rounded-[15px]"
-                  >
-                    {isToggle ? "View Summary Table" : "View Fitment Summary"} <Tooltip title="Free - more detailed analysis of your Fitment Adoption score
-">
-                    <InfoIcon style={{ fontSize: 11}} />
-                  </Tooltip>
-                  </button>
-                </div> */}
-                </div>
-              ) : (
-                " "
-              )}
-            </div>
+    <div className="flex min-h-screen bg-[#F7F9FC] font-poppins text-[#0F172A]">
+      {/* Sidebar */}
+      <aside className="fixed left-0 top-0 flex h-screen w-[256px] flex-col bg-[#0B1426] px-4 py-6">
+        <div className="flex items-center gap-2.5 px-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1D4ED8]">
+            <ArrowLeftRight className="h-5 w-5 text-white" />
           </div>
-
-          {/* Right Table: eBay Seller Details */}
-
-          {!isToggle ? (
-            <div
-              className={`border border-borderColor rounded-[15px] p-[25px] min-h-[350px] mb-10 ${
-                isToggle ? "min-w-[950px]" : "min-w-[650px]"
-              } static z-[0]`}
-            >
-              <>
-                <div className="flex justify-between  w-full mb-0">
-                  {/* eBay Seller Details (Left) */}
-                  <p className="text-lg text-[#0F0C22] font-poppins font-medium">
-                   <img src={ebayLogo} alt="ebay Logo" width={100} height={30} />
-                  </p>
-
-                  {/* old code before introducting shopify */}
-                  {/* <div className="flex flex-col items-end gap-y-4">
-               
-                    <button
-                      onClick={() => dispatch(registerModal(true))}
-                      className="px-5 py-2.5 text-sm text-white bg-primary font-poppins font-medium rounded-[15px]"
-                    >
-                     Link your eBay store
-                      <Tooltip title="You may add multiple stores, to your account, please use this link to do so. This will then start the download process, and be added into your profile">
-                        <InfoIcon
-                          style={{
-                            fontSize: 11,
-                            color: "white",
-                            marginLeft: 8,
-                          }}
-                        />
-                      </Tooltip>
-                    </button>
-                  </div> */}
-
-                  {/* new code to include shopify and temu store */}
-
-                  <div className="flex flex-col items-end gap-y-4">
-                    <FormControl
-  size="small"
-  sx={{
-    minWidth: 220,
-    bgcolor: "#fff",
-      color: "#0F0C22",
-      fontFamily: "Poppins",
-      fontWeight: 500,
-    borderRadius: "15px",
-    boxShadow: 1,
-    "& .MuiInputBase-root": {
-      borderRadius: "15px",
-    },
-    "& .MuiInputLabel-root": {
-      borderRadius: "15px",
-      backgroundColor: "white",
-      px: 1,
-      mx: 1,
-    },
-  }}
-  style={{ minWidth: 220 }}
-  className="bg-white rounded-[10px] shadow-sm"
->
-  <InputLabel id="platform-select-label" style={{ color: "#0F0C22",
-      fontFamily: "Poppins",
-      fontWeight: 500,}}>Link Your Store</InputLabel>
-  <Select
-    labelId="platform-select-label"
-    // value={platform}
-    label="Link Your Store"
-    onChange={handleChange}
-  >
-    <MenuItem value="ebay">Link with eBay Store</MenuItem>
-    <MenuItem value="shopify">Link with Shopify Store</MenuItem>
-    <MenuItem value="temu">Link with Temu Store</MenuItem>
-     <MenuItem value="allegro">Link with Allegro Store</MenuItem>
-  </Select>
-</FormControl>
-
-                  </div>
-                </div>
-
-                <div className="flex flex-col">
-                  {/* Summary Table */}
-                  <SummaryTable accounts={summaryData?.accounts} />
-
-                  {/* Buttons at the bottom */}
-                  {/* <div className="flex flex-row gap-x-4 justify-end items-end mt-4">
-                  
-                    <button
-                      onClick={() => dispatch(registerModal(true))}
-                      className="px-5 py-2.5 text-sm text-white bg-primary font-poppins font-medium rounded-[15px]"
-                    >
-                      Update Listing
-                      <Tooltip title="Update your listings">
-                        <EditIcon
-                          style={{
-                            fontSize: 15,
-                            color: "white",
-                            marginLeft: 8,
-                          }}
-                        />
-                      </Tooltip>
-                    </button>
-
-                  
-                    <button
-                      onClick={() => dispatch(registerModal(true))}
-                      className="px-5 py-2.5 text-sm text-white bg-primary font-poppins font-medium rounded-[15px]"
-                    >
-                      Refresh Listing
-                      <Tooltip title="Refresh your listings">
-                        <RefreshIcon
-                          style={{
-                            fontSize: 16,
-                            color: "white",
-                            marginLeft: 8,
-                          }}
-                        />
-                      </Tooltip>
-                    </button>
-                  </div> */}
-                </div>
-              </>
-            </div>
-          ) : (
-            <div className="border border-borderColor rounded-[15px] p-[25px] min-w-[950px] min-h-[330px] static z-[0]">
-              <SummaryFitmentTable
-                categories={summaryFitmentData?.categories}
-                setPaginationCurrentPage={setCurrentPage}
-              />
-
-              {/* Pagination for Fitment Table */}
-              {summaryFitmentData?.fitmentCount > 1 && (
-                <div className="flex flex-col items-end mt-[18px]">
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={summaryFitmentData?.fitmentCount || 1}
-                    onPageChange={handlePageChange}
-                  />
-                </div>
-              )}
-            </div>
-          )}
+          <span className="text-[19px] font-bold text-white">eBay2Temu</span>
         </div>
 
-        {/* New row for Dashboard Table Two */}
-        {!isToggle && (
-          <div
-            className={`${
-              isTableVisible ? "block" : "hidden"
-            } w-full mt-1 relative overflow-hidden`}
+        <nav className="mt-8 flex flex-col gap-1">
+          {NAV_ITEMS.map(({ label, Icon, key }) => {
+            const active = key === 'migrations';
+            return (
+              <button
+                key={key}
+                onClick={() => key === 'dashboard' && navigate('/dashboard')}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium transition ${
+                  active
+                    ? 'bg-[#1B2B47] text-white'
+                    : 'text-[#94A3B8] hover:bg-[#131F36] hover:text-white'
+                }`}
+              >
+                <Icon className="h-[18px] w-[18px]" />
+                {label}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="mt-auto flex flex-col gap-1 border-t border-[#1B2B47] pt-4">
+          <button
+            onClick={() => navigate('/profile')}
+            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium text-[#94A3B8] transition hover:bg-[#131F36] hover:text-white"
           >
-            <DashboardTableTwo
-              headerItems={tableHeaderData}
-              bodyItems={inboxData?.entries ?? []}
-            />
+            <Settings className="h-[18px] w-[18px]" />
+            Settings
+          </button>
+          <button className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium text-[#94A3B8] transition hover:bg-[#131F36] hover:text-white">
+            <BookOpen className="h-[18px] w-[18px]" />
+            Documentation
+          </button>
+        </div>
+      </aside>
+
+      {/* Main */}
+      <main className="ml-[256px] flex-1 px-8 py-8">
+        {/* Header */}
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-[22px] font-bold text-[#0F172A]">
+              Accounts &amp; Migration Results
+            </h1>
+            <p className="mt-1 text-[15px] text-[#64748B]">
+              Manage connected marketplaces and review your latest synchronization operations.
+            </p>
           </div>
-        )}
-      </div>
 
-      {/* Support Message */}
-      <div style={{ position: "sticky", zIndex: "2000" }}>
-        <SupportMessage />
-      </div>
-      
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <button
+                onClick={() => setShowConnect((v) => !v)}
+                className="inline-flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-4 py-2.5 text-[14px] font-semibold text-[#334155] transition hover:bg-[#F8FAFC]"
+              >
+                <Link2 className="h-[18px] w-[18px]" />
+                Connect Account
+              </button>
+              {showConnect && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setShowConnect(false)} />
+                  <div className="absolute right-0 z-20 mt-2 w-60 rounded-xl border border-[#E5E7EB] bg-white p-1.5 shadow-[0_10px_40px_-12px_rgba(15,23,42,0.2)]">
+                    {platformOptions.map((p) => {
+                      const disabled = p.value === 'temu' && hasTemu;
+                      return (
+                        <button
+                          key={p.value}
+                          onClick={() => openPlatform(p.value)}
+                          disabled={disabled}
+                          className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-[14px] font-medium text-[#334155] transition hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:text-[#94A3B8] disabled:hover:bg-transparent"
+                        >
+                          {p.label}
+                          {disabled && (
+                            <span className="text-[11px] font-normal text-[#94A3B8]">
+                              Connected
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
 
-      <div>
-        {isNewUser && (
-          <WelcomeUser
-        open={showWelcomeDialog}
-        onClose={() => setShowWelcomeDialog(false)}
-        onLinkEbay={handleLinkEbay}
-      />
-        )}
-      
-      </div>
+            <button
+              onClick={fetchAccountSummary}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#1D4ED8] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#1A45BE]"
+            >
+              <RefreshCw className="h-[18px] w-[18px]" />
+              Run Sync
+            </button>
+          </div>
+        </div>
+
+        {/* Account cards */}
+        <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-3">
+          {accounts.map((account) => (
+            <AccountCard key={account.accountId} account={account} onSync={fetchAccountSummary} />
+          ))}
+
+          {/* Add marketplace */}
+          <button
+            onClick={() => setShowConnect(true)}
+            className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#CBD5E1] bg-transparent p-5 text-center transition hover:border-[#1D4ED8] hover:bg-[#F8FAFC]"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#EFF4FF]">
+              <Plus className="h-6 w-6 text-[#1D4ED8]" />
+            </div>
+            <h3 className="mt-4 text-[17px] font-bold text-[#0F172A]">Add Marketplace</h3>
+            <p className="mt-1 max-w-[220px] text-[13px] text-[#64748B]">
+              Connect another eBay or TEMU store to expand your network.
+            </p>
+          </button>
+        </div>
+
+        {/* eBay listings readiness + migrations workspace */}
+        <MigrationReadinessPanel accounts={accounts} />
+      </main>
+
+      {isNewUser && (
+        <WelcomeUser
+          open={showWelcomeDialog}
+          onClose={() => setShowWelcomeDialog(false)}
+          onLinkEbay={handleLinkEbay}
+        />
+      )}
     </div>
   );
 };
