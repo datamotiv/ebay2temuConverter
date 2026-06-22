@@ -77,20 +77,19 @@ const router = createBrowserRouter([
 		path: "/set-new-password",
 		element: <SetNewPassword />,
 	},
+	{
+		path: "/dashboard",
+		element: (
+			<PrivateRoute>
+				<Dashboard />
+			</PrivateRoute>
+		),
+	},
 
 	{
 		path: "/",
 		element: <App />,
 		children: [
-			
-			{
-				path: "/dashboard",
-				element: (
-					<PrivateRoute>
-						<Dashboard />
-					</PrivateRoute>
-				),
-			},
 			{
 				path: "/dashboard-shopify",
 				element: (
