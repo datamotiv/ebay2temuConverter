@@ -4,7 +4,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, CheckCircle2 } from "lucide-react";
-import { useSigninTemuMutation } from "../Redux/features/auth/temuAuthApi";
+import { useSigninMutation } from "../Redux/features/auth/authApi";
 import { setAccessToken } from "../Redux/features/auth/authSlice";
 import { useAppDispatch } from "../Redux/hooks";
 import {
@@ -36,7 +36,7 @@ const Login = () => {
   });
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [signIn, { isLoading }] = useSigninTemuMutation();
+  const [signIn, { isLoading }] = useSigninMutation();
   const [sellerDialogOpen, setSellerDialogOpen] = useState(false);
   const [sellerList, setSellerList] = useState<Seller[]>([]);
   const [selectedUserIds, setSelectedUserIds] = useState<number | null>(null);
@@ -46,28 +46,31 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
 
     const { username, password } = loginInfo;
-    if (!username) return toast.error("Email can't be empty.");
-    if (!password) return toast.error("Password can't be empty.");
+    // if (!username) return toast.error("Email can't be empty.");
+    // if (!password) return toast.error("Password can't be empty.");
 
     try {
-      const result = await signIn({ email: username, password }).unwrap();
+      const result = await signIn(loginInfo).unwrap();
       setLoginResult(result);
 
-      if (result.admin && !username.includes("/")) {
-        const sellers = await fetchSellers(result.accessToken);
-        if (sellers.length > 0) {
-          setSellerList(sellers);
-          setSellerDialogOpen(true);
-        }
-        localStorage.setItem("isAdmin", String(result.admin));
-      } else {
-        handlePostLogin(username, result);
-      }
+      // if (result.admin && !username.includes("/")) {
+      //   const sellers = await fetchSellers(result.accessToken);
+      //   if (sellers.length > 0) {
+      //     setSellerList(sellers);
+      //     setSellerDialogOpen(true);
+      //   }
+      //   localStorage.setItem("isAdmin", String(result.admin));
+      // } else {
+      //   handlePostLogin(username, result);
+      // }
+       handlePostLogin(username, result);
     } catch (err: any) {
-      toast.error(err?.data?.message || err.message || "Login failed");
+      toast.error(err.message || "Login failed");
     }
+    
   };
 
   const handlePostLogin = (username: string, result: any) => {
@@ -109,7 +112,7 @@ const Login = () => {
     try {
       const modifiedUsername = `${loginInfo.username}/${selectedSellers.userId}`;
       const result = await signIn({
-        email: modifiedUsername,
+        username: modifiedUsername,
         password: loginInfo.password,
       }).unwrap();
 
