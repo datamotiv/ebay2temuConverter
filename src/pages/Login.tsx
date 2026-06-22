@@ -4,7 +4,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, CheckCircle2 } from "lucide-react";
-import { useSigninMutation } from "../Redux/features/auth/authApi";
+import { useSigninTemuMutation } from "../Redux/features/auth/temuAuthApi";
 import { setAccessToken } from "../Redux/features/auth/authSlice";
 import { useAppDispatch } from "../Redux/hooks";
 import {
@@ -36,9 +36,9 @@ const Login = () => {
   });
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [signIn, { isLoading }] = useSigninMutation();
+  const [signIn, { isLoading }] = useSigninTemuMutation();
   const [sellerDialogOpen, setSellerDialogOpen] = useState(false);
-  const [sellerList, setSellerList] = useState<Seller[]>([]);
+  const [sellerList] = useState<Seller[]>([]);
   const [selectedUserIds, setSelectedUserIds] = useState<number | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [openResetPasswordModal, setOpenResetPasswordModal] = useState(false);
@@ -53,7 +53,7 @@ const Login = () => {
     // if (!password) return toast.error("Password can't be empty.");
 
     try {
-      const result = await signIn(loginInfo).unwrap();
+      const result = await signIn({ email: username, password }).unwrap();
       setLoginResult(result);
 
       // if (result.admin && !username.includes("/")) {
@@ -68,9 +68,9 @@ const Login = () => {
       // }
        handlePostLogin(username, result);
     } catch (err: any) {
-      toast.error(err.message || "Login failed");
+      toast.error(err?.data?.message || err.message || "Login failed");
     }
-    
+
   };
 
   const handlePostLogin = (username: string, result: any) => {
@@ -79,24 +79,6 @@ const Login = () => {
     dispatch(setAccessToken(result));
     toast.success("Logged in successfully.");
     navigate("/dashboard");
-  };
-
-  const fetchSellers = async (token: string) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_API_KEY}/user/seller`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to fetch sellers");
-      return await response.json();
-    } catch (error) {
-      toast.error("Unable to fetch seller list.");
-      return [];
-    }
   };
 
   const handleSellerConfirm = async () => {
@@ -112,7 +94,7 @@ const Login = () => {
     try {
       const modifiedUsername = `${loginInfo.username}/${selectedSellers.userId}`;
       const result = await signIn({
-        username: modifiedUsername,
+        email: modifiedUsername,
         password: loginInfo.password,
       }).unwrap();
 
