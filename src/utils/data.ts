@@ -34,50 +34,52 @@ export const dashboardItems: TDashboardItems[] = [
   },
 
   
-  {
-    id: 3,
-    url: "/fitmentAdoptionSummary",
-    label: "Overview",
-    icon: HomeRoundedIcon,
-    tooltip:'',
-    children: [
-      {
-        id: 31,
-        url: "/fitmentAdoptionSummary",
-        label: "Fitment Adoption Summary",
-        icon: "",
-        tooltip:'',
-      },
-      {
-        id: 32,
-        url: "/listingOptimizationSummary",
-        label: "Listing Optimization",
-        icon: FormatListBulletedRoundedIcon,
-        tooltip:''
-      },
-      {
-        id: 33,
-        url: "/sales-insight",
-        label: "Sales Insight",
-        icon: AddchartRoundedIcon,
-        tooltip:'High-level view of what sales trends are being seen in the automotive sector'
-      },
-      // {
-      //   id: 32,
-      //   url: "/listingOp/drafts",
-      //   label: "Category Summary",
-      //   icon: "",
-      //   tooltip:'',
-      // },
-      // {
-      //   id: 33,
-      //   url: "/listingOp/drafts",
-      //   label: "Individual Listing Info",
-      //   icon: "",
-      //   tooltip:'',
-      // },
-    ],
-  },
+  // {
+  //   id: 3,
+  //   url: "/fitmentAdoptionSummary",
+  //   label: "Overview",
+  //   icon: HomeRoundedIcon,
+  //   tooltip:'',
+  //   children: [
+  //     {
+  //       id: 31,
+  //       url: "/fitmentAdoptionSummary",
+  //       label: "Fitment Adoption Summary",
+  //       icon: "",
+  //       tooltip:'',
+  //     },
+  //     {
+  //       id: 32,
+  //       url: "/listingOptimizationSummary",
+  //       label: "Listing Optimization",
+  //       icon: FormatListBulletedRoundedIcon,
+  //       tooltip:''
+  //     },
+  //     {
+  //       id: 33,
+  //       url: "/sales-insight",
+  //       label: "Sales Insight",
+  //       icon: AddchartRoundedIcon,
+  //       tooltip:'High-level view of what sales trends are being seen in the automotive sector'
+  //     },
+  //     // {
+  //     //   id: 32,
+  //     //   url: "/listingOp/drafts",
+  //     //   label: "Category Summary",
+  //     //   icon: "",
+  //     //   tooltip:'',
+  //     // },
+  //     // {
+  //     //   id: 33,
+  //     //   url: "/listingOp/drafts",
+  //     //   label: "Individual Listing Info",
+  //     //   icon: "",
+  //     //   tooltip:'',
+  //     // },
+  //   ],
+  // },
+
+
   // {
   //   id: 4,
   //   url: "/summary",
@@ -92,13 +94,13 @@ export const dashboardItems: TDashboardItems[] = [
   //   icon: AddchartRoundedIcon,
   //   tooltip:'High-level view of what sales trends are being seen in the automotive sector'
   // },
-  {
-    id: 6,
-    url: "/communicationHub",
-    label: "Communication Hub",
-    icon: HubIcon,
-    tooltip:"Area for you to ask questions, give and receive feedback"
-  },
+  // {
+  //   id: 6,
+  //   url: "/communicationHub",
+  //   label: "Communication Hub",
+  //   icon: HubIcon,
+  //   tooltip:"Area for you to ask questions, give and receive feedback"
+  // },
   // {
   //   id: 7,
   //   url: "/listingOp",
@@ -117,7 +119,7 @@ export const dashboardItems: TDashboardItems[] = [
   {
     id: 9,
     url: "/priceList",
-    label: "Pricing List",
+    label: "Billing",
     icon: PriceChangeIcon,
     tooltip:''
   },
@@ -125,7 +127,7 @@ export const dashboardItems: TDashboardItems[] = [
   {
     id: 10,
     url: "/migrationEbayToTemu",
-    label: "Migration Ebay to Temu",
+    label: "Migrations",
     icon: PriceChangeIcon,
     tooltip:''
   },

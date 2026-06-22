@@ -31,21 +31,21 @@ const stores = [
     bg: "#FFF4E5",
     url: "https://www.temu.com/login.html",
   },
-  {
-    name: "Shopify",
-    key: "shopify",
-    logo: shopifyLogo,
-    bg: "#E6FFF2",
-    url: "https://accounts.shopify.com/store-login",
-  },
+  // {
+  //   name: "Shopify",
+  //   key: "shopify",
+  //   logo: shopifyLogo,
+  //   bg: "#E6FFF2",
+  //   url: "https://accounts.shopify.com/store-login",
+  // },
   
-  {
-    name: "Allegro",
-    key: "allegro",
-    logo: allegroLogo,
-    bg: "#FFF2F0",
-    url: "https://allegro.com/log-in",
-  },
+  // {
+  //   name: "Allegro",
+  //   key: "allegro",
+  //   logo: allegroLogo,
+  //   bg: "#FFF2F0",
+  //   url: "https://allegro.com/log-in",
+  // },
 ];
 
 
