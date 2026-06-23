@@ -1,14 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import {
-  ArrowLeftRight,
-  LayoutGrid,
-  Settings as SettingsIcon,
-  BookOpen,
-  Loader2,
-} from "lucide-react";
+import { Loader2 } from "lucide-react";
+import AppSidebar from "../components/AppSidebar";
 import {
   useGetProfileQuery,
   useUpdateProfileMutation,
@@ -22,7 +16,6 @@ interface ProfileForm {
 }
 
 const Settings = () => {
-  const navigate = useNavigate();
   const { data: profile, isLoading } = useGetProfileQuery();
   const [updateProfile, { isLoading: saving }] = useUpdateProfileMutation();
 
@@ -101,42 +94,10 @@ const Settings = () => {
 
   return (
     <div className="flex min-h-screen bg-[#F7F9FC] font-poppins text-[#0F172A]">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 flex h-screen w-[256px] flex-col bg-[#0B1426] px-4 py-6">
-        <div className="flex items-center gap-2.5 px-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1D4ED8]">
-            <ArrowLeftRight className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-[19px] font-bold text-white">eBay2Temu</span>
-        </div>
-
-        <nav className="mt-8 flex flex-col gap-1">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium text-[#94A3B8] transition hover:bg-[#131F36] hover:text-white"
-          >
-            <LayoutGrid className="h-[18px] w-[18px]" />
-            Dashboard
-          </button>
-        </nav>
-
-        <div className="mt-auto flex flex-col gap-1 border-t border-[#1B2B47] pt-4">
-          <button className="flex items-center gap-3 rounded-lg bg-[#1B2B47] px-3 py-2.5 text-[15px] font-medium text-white">
-            <SettingsIcon className="h-[18px] w-[18px]" />
-            Settings
-          </button>
-          <button
-            onClick={() => navigate("/documentation")}
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium text-[#94A3B8] transition hover:bg-[#131F36] hover:text-white"
-          >
-            <BookOpen className="h-[18px] w-[18px]" />
-            Documentation
-          </button>
-        </div>
-      </aside>
+      <AppSidebar active="settings" />
 
       {/* Main */}
-      <main className="ml-[256px] flex-1 px-8 py-8">
+      <main className="flex-1 px-8 py-8">
         <div className="mx-auto max-w-[640px]">
           <div className="mb-8">
             <h1 className="text-[28px] font-bold text-[#0F172A]">Settings</h1>

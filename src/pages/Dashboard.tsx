@@ -1,16 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  ArrowLeftRight,
-  BookOpen,
-  Link2,
-  Plus,
-  RefreshCcw,
-  Settings,
-  ShoppingBag,
-  Store,
-} from 'lucide-react';
+import { Link2, Plus, RefreshCcw, ShoppingBag, Store } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AppSidebar from '../components/AppSidebar';
 import MigrationReadinessPanel from '../components/dashboard/MigrationReadinessPanel';
 import ShippingTemplateModal from '../components/dashboard/ShippingTemplateModal';
 import WelcomeUser from './WelcomeUser';
@@ -26,8 +18,6 @@ const platformOptions: { label: string; value: Platform }[] = [
   { label: 'Link with eBay Store', value: 'ebay' },
   { label: 'Link with Temu Store', value: 'temu' },
 ];
-
-const NAV_ITEMS = [{ label: 'Dashboard', Icon: ArrowLeftRight, key: 'dashboard' }];
 
 interface Account {
   accountId: number;
@@ -215,55 +205,10 @@ const Dashboard = () => {
 
   return (
     <div className="flex min-h-screen bg-[#F7F9FC] font-poppins text-[#0F172A]">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 flex h-screen w-[256px] flex-col bg-[#0B1426] px-4 py-6">
-        <div className="flex items-center gap-2.5 px-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1D4ED8]">
-            <ArrowLeftRight className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-[19px] font-bold text-white">eBay2Temu</span>
-        </div>
-
-        <nav className="mt-8 flex flex-col gap-1">
-          {NAV_ITEMS.map(({ label, Icon, key }) => {
-            const active = key === 'dashboard';
-            return (
-              <button
-                key={key}
-                onClick={() => key === 'dashboard' && navigate('/dashboard')}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium transition ${
-                  active
-                    ? 'bg-[#1B2B47] text-white'
-                    : 'text-[#94A3B8] hover:bg-[#131F36] hover:text-white'
-                }`}
-              >
-                <Icon className="h-[18px] w-[18px]" />
-                {label}
-              </button>
-            );
-          })}
-        </nav>
-
-        <div className="mt-auto flex flex-col gap-1 border-t border-[#1B2B47] pt-4">
-          <button
-            onClick={() => navigate('/settings')}
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium text-[#94A3B8] transition hover:bg-[#131F36] hover:text-white"
-          >
-            <Settings className="h-[18px] w-[18px]" />
-            Settings
-          </button>
-          <button
-            onClick={() => navigate('/documentation')}
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium text-[#94A3B8] transition hover:bg-[#131F36] hover:text-white"
-          >
-            <BookOpen className="h-[18px] w-[18px]" />
-            Documentation
-          </button>
-        </div>
-      </aside>
+      <AppSidebar active="dashboard" />
 
       {/* Main */}
-      <main className="ml-[256px] flex-1 px-8 py-8">
+      <main className="flex-1 px-8 py-8">
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
