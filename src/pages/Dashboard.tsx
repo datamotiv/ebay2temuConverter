@@ -27,7 +27,7 @@ const platformOptions: { label: string; value: Platform }[] = [
   { label: 'Link with Temu Store', value: 'temu' },
 ];
 
-const NAV_ITEMS = [{ label: 'Migrations', Icon: ArrowLeftRight, key: 'migrations' }];
+const NAV_ITEMS = [{ label: 'Dashboard', Icon: ArrowLeftRight, key: 'dashboard' }];
 
 interface Account {
   accountId: number;
@@ -226,7 +226,7 @@ const Dashboard = () => {
 
         <nav className="mt-8 flex flex-col gap-1">
           {NAV_ITEMS.map(({ label, Icon, key }) => {
-            const active = key === 'migrations';
+            const active = key === 'dashboard';
             return (
               <button
                 key={key}
@@ -246,13 +246,16 @@ const Dashboard = () => {
 
         <div className="mt-auto flex flex-col gap-1 border-t border-[#1B2B47] pt-4">
           <button
-            onClick={() => navigate('/profile')}
+            onClick={() => navigate('/settings')}
             className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium text-[#94A3B8] transition hover:bg-[#131F36] hover:text-white"
           >
             <Settings className="h-[18px] w-[18px]" />
             Settings
           </button>
-          <button className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium text-[#94A3B8] transition hover:bg-[#131F36] hover:text-white">
+          <button
+            onClick={() => navigate('/documentation')}
+            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium text-[#94A3B8] transition hover:bg-[#131F36] hover:text-white"
+          >
             <BookOpen className="h-[18px] w-[18px]" />
             Documentation
           </button>
