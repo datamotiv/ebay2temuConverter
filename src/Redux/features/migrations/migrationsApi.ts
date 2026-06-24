@@ -39,14 +39,16 @@ export const migrationsApi = createApi({
         accountId: number;
         sellerId: number;
         sourceListingIds: (string | number)[];
+        orderId?: string;
       }
     >({
-      query: ({ accountId, sellerId, sourceListingIds }) => ({
+      query: ({ accountId, sellerId, sourceListingIds, orderId }) => ({
         url: "/v1/migrations",
         method: "POST",
         body: {
           accountId,
           sellerId,
+          ...(orderId ? { orderId } : {}),
           listings: sourceListingIds.map((id) => ({
             sourceListingId: String(id),
           })),

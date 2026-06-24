@@ -24,8 +24,11 @@ import {
 } from "../../Redux/features/summary/summaryApi";
 import {
   useValidateListingsMutation,
-  useCreateMigrationMutation,
 } from "../../Redux/features/migrations/migrationsApi";
+import {
+  useCreateCheckoutMutation,
+  savePendingMigration,
+} from "../../Redux/features/payments/paymentsApi";
 import { calcMigrationCost, formatGBP } from "../../utils/pricing";
 import PaymentModal from "./PaymentModal";
 import MigrationsTab from "./MigrationsTab";
@@ -141,8 +144,8 @@ const MigrationReadinessPanel = ({ accounts }: { accounts: Account[] }) => {
     useSummaryFitmentDetailsMutation();
   const [validateListings, { isLoading: validating }] =
     useValidateListingsMutation();
-  const [createMigration, { isLoading: creating }] =
-    useCreateMigrationMutation();
+  const [createCheckout, { isLoading: creatingCheckout }] =
+    useCreateCheckoutMutation();
 
   const openCategory = (category: any) => {
     setSelectedCategory(category);
@@ -241,17 +244,18 @@ const MigrationReadinessPanel = ({ accounts }: { accounts: Account[] }) => {
       return;
     }
     try {
-      await createMigration({
+      const result = await createCheckout({ listingCount: selectedIds.length }).unwrap();
+      // Persist selected listings across the Stripe redirect so the success
+      // page can create the migration job once payment is confirmed.
+      savePendingMigration({
+        orderId: result.orderId,
+        selectedIds,
         accountId: temuAccount.accountId,
         sellerId: temuAccount.sellerId,
-        sourceListingIds: selectedIds,
-      }).unwrap();
-      toast.success("Migration started.");
-      setPaymentOpen(false);
-      setSelectedIds([]);
-      setTab("migrations");
+      });
+      window.location.href = result.checkoutUrl;
     } catch (e: any) {
-      toast.error(e?.data?.message || "Failed to start migration.");
+      toast.error(e?.data?.message || "Failed to create checkout session.");
     }
   };
 
@@ -613,7 +617,7 @@ const MigrationReadinessPanel = ({ accounts }: { accounts: Account[] }) => {
         onClose={() => setPaymentOpen(false)}
         count={selectedIds.length}
         onConfirm={handleConfirmMigration}
-        isSubmitting={creating}
+        isSubmitting={creatingCheckout}
       />
     </div>
   );

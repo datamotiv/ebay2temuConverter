@@ -2,6 +2,7 @@
 import { apiSlice } from "./api/apiSlice";
 import { temuAuthApi } from "./features/auth/temuAuthApi";
 import { migrationsApi } from "./features/migrations/migrationsApi";
+import { paymentsApi } from "./features/payments/paymentsApi";
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./features/auth/authSlice";
 import paymentModalReducer from "./features/paymentModalSlice";
@@ -13,6 +14,7 @@ export const store = configureStore({
 		[apiSlice.reducerPath]: apiSlice.reducer,
 		[temuAuthApi.reducerPath]: temuAuthApi.reducer,
 		[migrationsApi.reducerPath]: migrationsApi.reducer,
+		[paymentsApi.reducerPath]: paymentsApi.reducer,
 		paymentModal: paymentModalReducer,
 		registerModal: registerSellerModalReducer,
 		auth: authReducer,
@@ -29,7 +31,8 @@ export const store = configureStore({
 		getDefaultMiddleware().concat(
 			apiSlice.middleware,
 			temuAuthApi.middleware,
-			migrationsApi.middleware
+			migrationsApi.middleware,
+			paymentsApi.middleware
 		),
 });
 
