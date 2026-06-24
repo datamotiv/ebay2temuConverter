@@ -1,5 +1,5 @@
 import { Dialog } from "@mui/material";
-import { X, Loader2, Info } from "lucide-react";
+import { X, Loader2, Lock } from "lucide-react";
 import {
   PRICING_TIERS,
   calcMigrationCost,
@@ -100,10 +100,9 @@ const PaymentModal = ({
           </div>
         </div>
 
-        <p className="mt-4 flex items-start gap-2 text-[13px] text-[#94A3B8]">
-          <Info className="mt-0.5 h-4 w-4 shrink-0" />
-          Payment processing is coming soon — for now this starts the migration
-          immediately. You'll be billed once invoicing is enabled.
+        <p className="mt-4 flex items-center gap-2 text-[13px] text-[#94A3B8]">
+          <Lock className="h-3.5 w-3.5 shrink-0" />
+          Secure payment via Stripe. You'll be redirected to complete checkout.
         </p>
 
         <div className="mt-6 flex items-center justify-end gap-3">
@@ -119,12 +118,15 @@ const PaymentModal = ({
             type="button"
             onClick={onConfirm}
             disabled={isSubmitting || count === 0}
-            className="flex min-w-[200px] items-center justify-center rounded-lg bg-[#1D4ED8] px-5 py-2.5 text-[15px] font-semibold text-white transition hover:bg-[#1A45BE] disabled:cursor-not-allowed disabled:opacity-70"
+            className="flex min-w-[200px] items-center justify-center gap-2 rounded-lg bg-[#1D4ED8] px-5 py-2.5 text-[15px] font-semibold text-white transition hover:bg-[#1A45BE] disabled:cursor-not-allowed disabled:opacity-70"
           >
             {isSubmitting ? (
               <Loader2 className="h-[18px] w-[18px] animate-spin" />
             ) : (
-              `Confirm & Start Migration`
+              <>
+                <Lock className="h-4 w-4" />
+                Pay with Stripe
+              </>
             )}
           </button>
         </div>

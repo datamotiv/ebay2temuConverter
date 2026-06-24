@@ -1,5 +1,6 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import StripeReturnPage from '../components/StripeReturnPage';
+import MigrateSuccessPage from '../pages/MigrateSuccessPage';
 import Verification from '../components/Verification';
 import Dashboard from '../pages/Dashboard';
 import Documentation from '../pages/Documentation';
@@ -20,6 +21,14 @@ const router = createBrowserRouter([
   {
     path: '/stripeReturn',
     element: <StripeReturnPage />,
+  },
+  {
+    path: '/migrate/success',
+    element: <MigrateSuccessPage />,
+  },
+  {
+    path: '/migrate/pay',
+    element: <Navigate to="/dashboard" replace />,
   },
   {
     path: '/',
