@@ -1,9 +1,7 @@
 import { Card, Box,Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import ebayLogo from "../assets/images/ebay-logo.png";
-import shopifyLogo from "../assets/images/Shopify-Logo.png";
 import temuLogo from "../assets/images/temu-logo.png";
-import allegroLogo from "../assets/images/allegro-logo.png";
 import Navbar from "../components/Navbar";
 import { connectTemu } from "../services/temuService";
 import { useSelector } from "react-redux";
@@ -65,11 +63,9 @@ const [openSnackbar, setOpenSnackbar] =
   useState(false);
  
 const sellerId = useSelector((state: any) => state.auth.sellerId);
-console.log(sellerId);
 
 // working temu connect
 // const handleTemuClick = async () => {
-//   debugger;
   
 //   try {
 //     const res: any = await connectTemu(sellerId);
@@ -78,7 +74,6 @@ console.log(sellerId);
 //       console.error("authUrl not found", res);
 //       return;
 //     }
-// console.log(res, 'check auth link');
 //     // redirect to Temu
 //     window.location.href = res.authUrl;
 
@@ -88,7 +83,6 @@ console.log(sellerId);
 // };
 
 const handleTemuClick = async () => {
-  debugger;
   try {
     setLoading(true);
 
@@ -96,7 +90,6 @@ const handleTemuClick = async () => {
       sellerId
     );
 
-    console.log(res, "check auth link");
 
     // =====================================
     // SUCCESS

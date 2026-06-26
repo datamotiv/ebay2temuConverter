@@ -15,7 +15,6 @@ const migrationId =
   paramId ||
   location.state?.migrationId;
 
-  console.log(paramId, 'tetist')
 
   const fetchItems = async () => {
     const token = localStorage.getItem("accessToken");
@@ -33,7 +32,6 @@ const migrationId =
       );
 
       const data = await res.json();
-      console.log(data, 'job tatas tdat')
       setItems(data.items || []);
     } catch (err) {
       console.error(err);
@@ -51,7 +49,6 @@ useEffect(() => {
 // api call for retry
 const retryMigration = async (migrationId: string) => {
   const token = localStorage.getItem("accessToken");
-debugger;
   try {
     const response = await fetch(
       `${import.meta.env.VITE_LOCAL_TEMU_BASE_URL}/api/v1/migrations/${migrationId}/retry`,

@@ -75,7 +75,6 @@ const DashboardAllegro = () => {
     pageSize: 50,
   });
   // const isAdmin = localStorage.getItem("isAdmin") === 'true' ? true : false;
-  // console.log(isAdmin)
 
 
   const optimizationHistory = [
@@ -189,7 +188,6 @@ const DashboardAllegro = () => {
                                        path = "",
                                      }) => {
     try {
-      //  debugger;
       const numericCategoryID = categoryID?.match(/^\d+/)?.[0] || "";
 
       if (numericCategoryID == "") {
@@ -263,7 +261,6 @@ const DashboardAllegro = () => {
     level = "",
   }) => {
     try {
-      //debugger;
       const numericCategoryID = categoryID?.match(/^\d+/)?.[0] || "";
 
       const params = new URLSearchParams({
@@ -295,7 +292,6 @@ const DashboardAllegro = () => {
       setListingOpDashboardScore(data.fitmentScore || HARDCODED_VALUES.listingOptimizationScore)
       dispatch(setListingOptimizationScore(data.fitmentScore || HARDCODED_VALUES.listingOptimizationScore))
       
-      // console.log("Fitment Summary Data:", data);
       return data;
     } catch (error) {
       console.error("Error fetching fitment summary:", error);
@@ -306,7 +302,6 @@ const DashboardAllegro = () => {
   };
   
   useEffect(() => {
-    //debugger;
     const fetchData = async () => {
       await fetchListingOptimizationScore({
         pageNumber: 1,

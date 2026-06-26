@@ -1,46 +1,62 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
-import toast from "react-hot-toast";
 import {
-  Loader2,
+  AlertCircle,
+  CheckCircle2,
   ChevronDown,
   ChevronRight,
-  RefreshCw,
-  CheckCircle2,
-  XCircle,
   Clock,
-  AlertCircle,
-} from "lucide-react";
+  Loader2,
+  RefreshCw,
+  XCircle,
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import {
   useListMigrationsQuery,
   useMigrationItemsQuery,
   useRetryMigrationMutation,
-} from "../../Redux/features/migrations/migrationsApi";
+} from '../../Redux/features/migrations/migrationsApi';
 
 const JOB_STATUS_CLS: Record<string, string> = {
-  COMPLETED: "bg-[#ECFDF5] text-[#059669]",
-  PROCESSING: "bg-[#EFF6FF] text-[#2563EB]",
-  QUEUED: "bg-[#FFF4E5] text-[#B58900]",
-  FAILED: "bg-[#FDECEA] text-[#DC2626]",
-  PARTIAL_FAILED: "bg-[#FFF4E5] text-[#B58900]",
+  COMPLETED: 'bg-[#ECFDF5] text-[#059669]',
+  PROCESSING: 'bg-[#EFF6FF] text-[#2563EB]',
+  QUEUED: 'bg-[#FFF4E5] text-[#B58900]',
+  FAILED: 'bg-[#FDECEA] text-[#DC2626]',
+  PARTIAL_FAILED: 'bg-[#FFF4E5] text-[#B58900]',
 };
 
 const ITEM_STATUS: Record<string, { cls: string; Icon: any }> = {
-  DONE: { cls: "bg-[#ECFDF5] text-[#059669]", Icon: CheckCircle2 },
-  FAILED: { cls: "bg-[#FDECEA] text-[#DC2626]", Icon: XCircle },
-  PROCESSING: { cls: "bg-[#EFF6FF] text-[#2563EB]", Icon: Loader2 },
-  PENDING_REVIEW: { cls: "bg-[#FFF4E5] text-[#B58900]", Icon: Clock },
+  DONE: { cls: 'bg-[#ECFDF5] text-[#059669]', Icon: CheckCircle2 },
+  FAILED: { cls: 'bg-[#FDECEA] text-[#DC2626]', Icon: XCircle },
+  PROCESSING: { cls: 'bg-[#EFF6FF] text-[#2563EB]', Icon: Loader2 },
+  PENDING_REVIEW: { cls: 'bg-[#FFF4E5] text-[#B58900]', Icon: Clock },
 };
 
 const isLive = (status: string) =>
-  status === "PROCESSING" || status === "QUEUED";
+  status === 'PROCESSING' || status === 'QUEUED';
 
-const MigrationItems = ({ migrationId, live }: { migrationId: string; live: boolean }) => {
-  const { data, isLoading } = useMigrationItemsQuery(
+const MigrationItems = ({
+  migrationId,
+  live,
+  highlighted = false,
+}: {
+  migrationId: string;
+  live: boolean;
+  highlighted?: boolean;
+}) => {
+  const { data, isLoading, refetch } = useMigrationItemsQuery(
     { migrationId },
-    { pollingInterval: live ? 5000 : 0 }
+    { pollingInterval: live ? 3000 : 0 },
   );
   const items = data?.items ?? [];
+
+  const prevLiveRef = useRef(live);
+  useEffect(() => {
+    if (prevLiveRef.current && !live) {
+      refetch();
+    }
+    prevLiveRef.current = live;
+  }, [live, refetch]);
 
   if (isLoading) {
     return (
@@ -58,10 +74,12 @@ const MigrationItems = ({ migrationId, live }: { migrationId: string; live: bool
   }
 
   return (
-    <div className="divide-y divide-[#F1F5F9] border-t border-[#F1F5F9] bg-[#FAFBFD]">
+    <div
+      className={`divide-y border-t ${highlighted ? 'divide-[#C7D7F7] rounded-xl border-[#C7D7F7] bg-[#E8EFFE]' : 'divide-[#F1F5F9] border-[#F1F5F9] bg-[#FAFBFD]'}`}
+    >
       {items.map((item: any) => {
         const meta = ITEM_STATUS[item.status] ?? {
-          cls: "bg-[#F1F5F9] text-[#64748B]",
+          cls: 'bg-[#F1F5F9] text-[#64748B]',
           Icon: AlertCircle,
         };
         const errorMsg = item.errors?.[0]?.message;
@@ -75,7 +93,9 @@ const MigrationItems = ({ migrationId, live }: { migrationId: string; live: bool
                 {item.sourceListingId}
               </p>
               {errorMsg && (
-                <p className="truncate text-[12px] text-[#DC2626]">{errorMsg}</p>
+                <p className="truncate text-[12px] text-[#DC2626]">
+                  {errorMsg}
+                </p>
               )}
             </div>
             <span
@@ -83,7 +103,7 @@ const MigrationItems = ({ migrationId, live }: { migrationId: string; live: bool
             >
               <meta.Icon
                 className={`h-3.5 w-3.5 ${
-                  item.status === "PROCESSING" ? "animate-spin" : ""
+                  item.status === 'PROCESSING' ? 'animate-spin' : ''
                 }`}
               />
               {item.status}
@@ -95,25 +115,60 @@ const MigrationItems = ({ migrationId, live }: { migrationId: string; live: bool
   );
 };
 
-const MigrationsTab = ({ active }: { active: boolean }) => {
+const MigrationsTab = ({
+  active,
+  highlightId,
+}: {
+  active: boolean;
+  highlightId?: string;
+}) => {
   const [page, setPage] = useState(1);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [highlightActive, setHighlightActive] = useState(false);
+  const highlightFiredRef = useRef(false);
+  const highlightRowRef = useRef<HTMLDivElement>(null);
 
-  const { data, isLoading, isFetching } = useListMigrationsQuery(
+  const { data, isLoading, isFetching, refetch } = useListMigrationsQuery(
     { page, limit: 10 },
-    { skip: !active, pollingInterval: active ? 5000 : 0 }
+    { skip: !active, pollingInterval: active ? 3000 : 0 },
   );
   const jobs = data?.items ?? [];
   const meta = data?.meta;
+
+  // Bypass cache immediately when arriving with a highlight ID
+  useEffect(() => {
+    if (highlightId && active) refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightId]);
+
+  // Fire highlight once the target job appears in the list
+  useEffect(() => {
+    if (!highlightId || highlightFiredRef.current) return;
+    if (!jobs.some((j: any) => j.migrationId === highlightId)) return;
+    highlightFiredRef.current = true;
+    setExpanded(highlightId);
+    setHighlightActive(true);
+    setTimeout(
+      () =>
+        highlightRowRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        }),
+      80,
+    );
+    const t = setTimeout(() => setHighlightActive(false), 5000);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightId, jobs]);
 
   const [retryMigration, { isLoading: retrying }] = useRetryMigrationMutation();
 
   const handleRetry = async (migrationId: string) => {
     try {
       await retryMigration({ migrationId }).unwrap();
-      toast.success("Retry started");
+      toast.success('Retry started');
     } catch (e: any) {
-      toast.error(e?.data?.message || "Retry failed");
+      toast.error(e?.data?.message || 'Retry failed');
     }
   };
 
@@ -141,24 +196,29 @@ const MigrationsTab = ({ active }: { active: boolean }) => {
           const pct = Number(job.progressPercentage ?? 0);
           const summary = [
             `${job.publishedCount ?? 0} of ${job.total ?? 0} published`,
-            job.failedCount ? `${job.failedCount} failed` : "",
-            job.pendingCount ? `${job.pendingCount} pending` : "",
+            job.failedCount ? `${job.failedCount} failed` : '',
+            job.pendingCount ? `${job.pendingCount} pending` : '',
           ]
             .filter(Boolean)
-            .join(" · ");
+            .join(' · ');
 
+          const isHighlighted =
+            highlightActive && job.migrationId === highlightId;
           return (
             <div
               key={job.migrationId}
-              className="rounded-xl border border-[#E5E7EB] bg-white"
+              ref={isHighlighted ? highlightRowRef : undefined}
+              className={`rounded-xl border transition-all duration-1000 ${
+                isHighlighted
+                  ? 'border-[#1D4ED8] bg-[#EFF4FF] shadow-[0_0_0_4px_rgba(29,78,216,0.12)]'
+                  : 'border-[#E5E7EB] bg-white shadow-none'
+              }`}
             >
               <div className="flex flex-wrap items-center gap-4 p-4">
                 <button
-                  onClick={() =>
-                    setExpanded(open ? null : job.migrationId)
-                  }
+                  onClick={() => setExpanded(open ? null : job.migrationId)}
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#E2E8F0] text-[#475569] transition hover:bg-[#F8FAFC]"
-                  aria-label={open ? "Collapse" : "Expand"}
+                  aria-label={open ? 'Collapse' : 'Expand'}
                 >
                   {open ? (
                     <ChevronDown className="h-4 w-4" />
@@ -175,7 +235,7 @@ const MigrationsTab = ({ active }: { active: boolean }) => {
                     <span
                       className={`inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[12px] font-medium ${
                         JOB_STATUS_CLS[job.status] ??
-                        "bg-[#F1F5F9] text-[#64748B]"
+                        'bg-[#F1F5F9] text-[#64748B]'
                       }`}
                     >
                       {isLive(job.status) && (
@@ -215,6 +275,7 @@ const MigrationsTab = ({ active }: { active: boolean }) => {
                 <MigrationItems
                   migrationId={job.migrationId}
                   live={isLive(job.status)}
+                  highlighted={isHighlighted}
                 />
               )}
             </div>

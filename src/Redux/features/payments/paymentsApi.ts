@@ -23,9 +23,16 @@ export interface PaymentOrder {
   refundedAt: string | null;
 }
 
+export interface PaymentStats {
+  totalChargedPence: number;
+  totalRefundedPence: number;
+  totalListings: number;
+  totalOrders: number;
+}
+
 export const paymentsApi = createApi({
   reducerPath: "ebay2temuPayments",
-  tagTypes: ["PaymentHistory"],
+  tagTypes: ["PaymentHistory", "PaymentStats"],
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_LOCAL_TEMU_BASE_URL,
     prepareHeaders: (headers) => {
@@ -54,10 +61,19 @@ export const paymentsApi = createApi({
       }),
       providesTags: ["PaymentHistory"],
     }),
+
+    getPaymentStats: builder.query<PaymentStats, void>({
+      query: () => "/v1/payments/stats",
+      providesTags: ["PaymentStats"],
+    }),
   }),
 });
 
-export const { useCreateCheckoutMutation, useGetPaymentHistoryQuery } = paymentsApi;
+export const {
+  useCreateCheckoutMutation,
+  useGetPaymentHistoryQuery,
+  useGetPaymentStatsQuery,
+} = paymentsApi;
 
 // ---------------------------------------------------------------------------
 // Pending migration stored in localStorage across the Stripe redirect

@@ -13,14 +13,10 @@ import {
 // import HomeIcon from "../assets/icons/HomeIcon";
 // import EditProfileIcon from "../assets/icons/EditProfileIcon";
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
-// import SummarizeRoundedIcon from '@mui/icons-material/SummarizeRounded';
-import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
 import Person4RoundedIcon from '@mui/icons-material/Person4Rounded';
-import AddchartRoundedIcon from '@mui/icons-material/AddchartRounded';
-import HubIcon from '@mui/icons-material/Hub';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PriceChangeIcon from '@mui/icons-material/PriceChange';
+import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded';
 
 
 export const dashboardItems: TDashboardItems[] = [
@@ -31,6 +27,13 @@ export const dashboardItems: TDashboardItems[] = [
     // icon: HomeIcon,
     icon: DashboardRoundedIcon,
     tooltip: "",
+  },
+  {
+    id: 11,
+    url: "/billing",
+    label: "Billing",
+    icon: ReceiptLongRoundedIcon,
+    tooltip: "Usage & Billing",
   },
 
   

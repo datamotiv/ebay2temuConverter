@@ -65,7 +65,6 @@ const [couponCode, setCouponCode] = useState("");
   //     // const result = await acceptOptimize({
   //     //   searchId: optimizeRequestId,
   //     // }).unwrap();
-  //     // console.log(result);
   //   } catch (error) {
   //     console.error("Error optimizing:", error);
   //   }
@@ -75,7 +74,6 @@ const [couponCode, setCouponCode] = useState("");
   const pageSize = 100;
 
   // useEffect(() => {
-  //   debugger;
   //   getFitmentDetails({
   //     searchResultId: id,
   //     pageNo: currentPage,
@@ -96,7 +94,6 @@ const [couponCode, setCouponCode] = useState("");
  
 
   useEffect(() => {
-    // debugger;
     if (id && categoryId && site && fitmentFilter) {
       // You can call an initial API here if needed
       fetchSummaryFitmentDetails(id, categoryId, site, fitmentFilter);
@@ -121,7 +118,6 @@ const [couponCode, setCouponCode] = useState("");
      const fetchSummaryFitmentDetails = async (id: string, categoryId: string, site: string, fitmentFilter: number) => 
       {
         const token = localStorage.getItem("accessToken");
-        // debugger;
         try {
         const response = await fetch("https://api.help-on-time.com/api/datacube/summary/fitment/detail", {
           method: "POST",
@@ -144,7 +140,6 @@ const [couponCode, setCouponCode] = useState("");
         }
     
         const data = await response.json();
-        // console.log(data, 'cat data')
         setBodyItems(data || [])
         const totalItems = data.totalItems || data.length || 0;
         setTotalPages(Math.ceil(totalItems / pageSize));
@@ -164,7 +159,6 @@ const [couponCode, setCouponCode] = useState("");
 
         const scoreData = await scoreResponse.json();
         dispatch(setCategoryFitmentScore(scoreData.categoryFitmentScore))
-// console.log(data, 'non fit,e')
         return data; // You can handle the data accordingly
         
       } catch (error) {
@@ -200,7 +194,6 @@ const [couponCode, setCouponCode] = useState("");
   // };
 
   // const handleOptimizeAll = async () => {
-  //   debugger;
   //   try {
   //     const result = await optimizeFitment({
   //       all: true,
@@ -227,7 +220,6 @@ const [couponCode, setCouponCode] = useState("");
 
   // Strip checkout logic here
   // const handleCheckout = async () => {
-  //   //debugger;
 
   //   try {
   //     const token = localStorage.getItem("accessToken");
@@ -255,7 +247,6 @@ const [couponCode, setCouponCode] = useState("");
   //     }
 
   //     const session = await response.json(); // Get session ID from backend
-  //     // console.log(session, 'sessionbck')
 
   //     const stripe = await stripePromise;
 
@@ -281,7 +272,6 @@ const [couponCode, setCouponCode] = useState("");
 
 
   const handleCheckoutForSelectedItems = async () => {
-    // debugger;
 
      if (!couponCode.trim()) {
     setOpenCouponDialog(true);

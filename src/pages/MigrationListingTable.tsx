@@ -51,7 +51,6 @@ extraItem,
   const fitmentFilter = "all";
   const [openDialog, setOpenDialog] = useState(false);
  
-// console.log(validationStatusMap, 'check mansa')
   // for optimising single plans
 //   const [optimizationSelections, setOptimizationSelections] = useState<{
 //   [id: string]: string[];
@@ -145,11 +144,9 @@ const handleSelectAll = () => {
       ? item.fitmentStatus
       : !item.fitmentStatus;
   });
-// console.log(filteredItems, "filtertiteh")
   const finalItems = extraItem
   ? [extraItem, ...filteredItems.filter(item => item.id !== extraItem.id)]
   : filteredItems;
-// console.log(finalItems, 'flt')
   // code for selection of optimisation
 //   const handleOptimizationChange = (id: any, option: string) => {
 //   setOptimizationSelections((prev) => {

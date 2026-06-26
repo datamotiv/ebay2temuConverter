@@ -19,7 +19,7 @@ import {
   ListItemText,
   ListItemButton,
 } from "@mui/material";
-import ForgotPasswordModal from "./ForgotPasswordModal ";
+import ForgotPasswordModal from "./ForgotPasswordModal";
 
 interface Seller {
   userId: number;
@@ -73,10 +73,34 @@ const Login = () => {
 
   };
 
-  const handlePostLogin = (username: string, result: any) => {
+  const handlePostLogin = async (username: string, result: any) => {
     localStorage.setItem("userName", username);
     localStorage.setItem("isAdmin", String(result.admin));
     dispatch(setAccessToken(result));
+
+    // New users (just verified email) go directly to onboarding.
+    if (localStorage.getItem("isNewUser") === "true") {
+      navigate("/onboarding");
+      return;
+    }
+
+    // Returning users with no connected accounts haven't finished onboarding.
+    try {
+      const resp = await fetch(
+        `${import.meta.env.VITE_LOCAL_TEMU_BASE_URL}/v1/auth/accounts/summary`,
+        { headers: { Authorization: `Bearer ${result.accessToken}` } }
+      );
+      if (resp.ok) {
+        const data = await resp.json();
+        if (!data.accounts?.length) {
+          navigate("/onboarding");
+          return;
+        }
+      }
+    } catch {
+      // On error fall through to dashboard
+    }
+
     toast.success("Logged in successfully.");
     navigate("/dashboard");
   };
@@ -135,7 +159,7 @@ const Login = () => {
       <div className="mx-auto flex min-h-screen max-w-[1280px] flex-col items-center justify-center gap-12 px-6 py-10 lg:flex-row lg:gap-16 lg:px-10">
         {/* Left: marketing */}
         <div className="w-full max-w-[560px]">
-          <h2 className="mb-10 text-xl font-bold text-[#1D4ED8]">eBay2Temu</h2>
+          <img src="/logo.png" alt="E2T Logo" className="mb-10 h-14 w-auto object-contain" />
 
           <h1 className="text-[44px] font-extrabold leading-[1.1] tracking-tight text-[#0F172A] sm:text-[52px]">
             Migrate Your eBay Listings to TEMU in Minutes

@@ -11,7 +11,6 @@ const ForgetPassword = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Add your logic to handle the forget password action here
-    // console.log("Email for password reset:", loginInfo.email);
   };
 
   return (

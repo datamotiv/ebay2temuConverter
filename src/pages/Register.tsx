@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, CheckCircle2, MailCheck } from "lucide-react";
-import { useSignupTemuMutation } from "../Redux/features/auth/temuAuthApi";
+import { useSignupTemuMutation, useResendVerificationMutation } from "../Redux/features/auth/temuAuthApi";
 
 interface RegisterInfo {
   fullName: string;
@@ -19,9 +19,11 @@ const features = ["End-to-end encryption", "99.9% uptime", "Real-time mapping"];
 
 const Register = () => {
   const [signUp, { isLoading }] = useSignupTemuMutation();
+  const [resendVerification, { isLoading: isResending }] = useResendVerificationMutation();
 
   const [showPassword, setShowPassword] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(false);
   const [registerInfo, setRegisterInfo] = useState<RegisterInfo>({
     fullName: "",
     companyName: "",
@@ -35,6 +37,18 @@ const Register = () => {
     (field: keyof RegisterInfo) =>
     (e: React.ChangeEvent<HTMLInputElement>) =>
       setRegisterInfo((prev) => ({ ...prev, [field]: e.target.value }));
+
+  const handleResend = async () => {
+    if (resendCooldown) return;
+    try {
+      await resendVerification({ email: registerInfo.email }).unwrap();
+      toast.success("Verification email resent — check your inbox.");
+      setResendCooldown(true);
+      setTimeout(() => setResendCooldown(false), 60_000);
+    } catch {
+      toast.error("Failed to resend. Please try again.");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +90,7 @@ const Register = () => {
       <div className="mx-auto flex min-h-screen max-w-[1280px] flex-col items-center justify-center gap-12 px-6 py-10 lg:flex-row lg:gap-16 lg:px-10">
         {/* Left: marketing */}
         <div className="w-full max-w-[560px]">
-          <h2 className="mb-10 text-xl font-bold text-[#1D4ED8]">eBay2Temu</h2>
+          <img src="/logo.png" alt="E2T Logo" className="mb-10 h-14 w-auto object-contain" />
 
           <h1 className="text-[44px] font-extrabold leading-[1.1] tracking-tight text-[#0F172A] sm:text-[52px]">
             Migrate Your eBay Listings to TEMU in Minutes
@@ -111,8 +125,7 @@ const Register = () => {
                 <span className="font-semibold text-[#334155]">
                   {registerInfo.email}
                 </span>
-                . Click it to activate your account. The link expires in 15
-                minutes.
+                . Click it to activate your account.
               </p>
               <Link
                 to="/login"
@@ -120,6 +133,18 @@ const Register = () => {
               >
                 Go to Login
               </Link>
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={isResending || resendCooldown}
+                className="mt-3 w-full rounded-lg border border-[#1D4ED8] py-2.5 text-[14px] font-medium text-[#1D4ED8] transition hover:bg-[#EFF6FF] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isResending
+                  ? "Sending…"
+                  : resendCooldown
+                  ? "Resent — check your inbox"
+                  : "Didn't receive it? Resend"}
+              </button>
             </div>
           ) : (
             <>

@@ -40,7 +40,6 @@ const FilterListingOptimizationData: React.FC<FilterDataProps> = ({
   //       site: selectedSite,
   //       categoryID: category || selectedCategory,
   //     }).unwrap();
-  //     // console.log("Fitment Score:", response.fitmentScore);
   //     // // dispatch(setFitmentScore(response.fitmentScore));
   //     // dispatch(setCountryFitmentScore(response.fitmentScore));
   //     if (category) {

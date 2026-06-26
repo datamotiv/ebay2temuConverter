@@ -6,19 +6,20 @@ import router from "./routes/routes.tsx";
 import { Toaster } from "react-hot-toast";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
+import ErrorBoundary from "./components/ErrorBoundary.tsx";
 import 'react-credit-cards-2/dist/es/styles-compiled.css';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import '@fontsource/poppins';
 
-
-//working code
 createRoot(document.getElementById("root")!).render(
-	<StrictMode>
-		<Provider store={store}>
-			<RouterProvider router={router} />
-			<Toaster />
-		</Provider>
-	</StrictMode>
+  <StrictMode>
+    <ErrorBoundary>
+      <Provider store={store}>
+        <RouterProvider router={router} />
+        <Toaster />
+      </Provider>
+    </ErrorBoundary>
+  </StrictMode>
 );
 
 //use this code if website is under maintainence

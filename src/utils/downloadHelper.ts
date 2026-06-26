@@ -1,5 +1,4 @@
 export const downloadReport = async (id: string) => {
-  // debugger;
   try {
     const token = localStorage.getItem("accessToken");
 
@@ -14,7 +13,6 @@ export const downloadReport = async (id: string) => {
         },
       }
     );
-    //   console.log(response, 'downloadHelpers')
     if (!response.ok) {
       throw new Error("Failed to fetch the file.");
     }

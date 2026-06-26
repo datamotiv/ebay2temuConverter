@@ -128,7 +128,6 @@ const CommunicationHub = () => {
   };
 
   const fetchTicketDetails = async (ticketId: string) => {
-    // debugger;
     setLoading(true);
     // setSelectedTicket(null);
     setModalOpen(true);
@@ -148,7 +147,6 @@ const CommunicationHub = () => {
       // const data: TicketDetails = await response.json();
 
       // setSelectedTicket(data);
-      // console.log(selectedTicket)
     } catch (error) {
       console.error("Error fetching ticket details:", error);
     } finally {

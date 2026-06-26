@@ -7,7 +7,6 @@ import InfoIcon from "@mui/icons-material/Info";
 const FitmentScoreChart = () => {
 //   const fitmentScore= useSelector((state: RootState) => state.setFitmentScore.fitmentScore) 
 //   const scoreValue = Number(fitmentScore); // Ensure it's a number
-//   console.log(scoreValue)
 
 // old code
 const selectedView = useSelector((state:RootState) => state.setCountryFitmentScore.selectedView);

@@ -40,9 +40,10 @@ const VerifyEmail = () => {
     })();
   }, [token, verifyEmail]);
 
-  // On success, send the user to login after a short pause.
+  // On success, mark new user and send to login after a short pause.
   useEffect(() => {
     if (status !== "success") return;
+    localStorage.setItem("isNewUser", "true");
     const timer = setTimeout(() => navigate("/login"), 4000);
     return () => clearTimeout(timer);
   }, [status, navigate]);

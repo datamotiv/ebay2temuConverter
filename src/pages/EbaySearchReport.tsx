@@ -34,7 +34,6 @@ const EbaySearchReport = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const sellerId = id;
-  console.log(sellerId,'sellertdgdv')
 
   const { data: sellerDetail, isLoading: loadingDetail } =
     useSellerDetailQuery(sellerId);

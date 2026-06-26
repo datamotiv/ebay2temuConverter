@@ -30,7 +30,6 @@ const EditProfile = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    // debugger;
     e.preventDefault();
     const res = await updateProfileData(profileInfo);
  

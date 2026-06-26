@@ -46,7 +46,6 @@ const MigrationCategoryPage: React.FC<SummaryFitmentTableProps> = ({ fetchSummar
     const filteredListings = filteredData.filter(
     (item:any) => item.categoryId === categoryId
   );
-  debugger;
     navigate(
   `/migration-listing-page/${searchResultId}/${categoryId}/${site}`,
   {
@@ -69,7 +68,6 @@ const filteredData = useMemo(() => {
 
    
   }, [JSON.stringify(categories)]);
-  // console.log(filteredData, 'filterdata')
 
   // const columns = listingOptimizationHeaderOptions.map(({ label, key }) => ({
   //   accessorKey: key, // This key should match with keys of body

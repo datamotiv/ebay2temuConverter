@@ -11,11 +11,14 @@ const AuthCallback = () => {
     const status = params.get("status");
     const sellerId = params.get("sellerId");
 
-    console.log("Status:", status);
-    console.log("SellerId:", sellerId);
 
     if (status === "success") {
-      navigate("/login");
+      const isOnboarding = localStorage.getItem("onboardingInProgress") === "true";
+      if (isOnboarding) {
+        navigate("/onboarding?connected=temu", { replace: true });
+      } else {
+        navigate("/dashboard?connected=temu", { replace: true });
+      }
     } else {
       navigate("/error");
     }

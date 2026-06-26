@@ -88,7 +88,6 @@ const ListingOptimizationSummary = () => {
     path?: string;  
   }) => {
     try {
-      // debugger;
       const numericCategoryID = categoryID?.match(/^\d+/)?.[0] || "";
 
       const params = new URLSearchParams({
@@ -136,7 +135,6 @@ const ListingOptimizationSummary = () => {
   };
 
    useEffect(() => {
-      // debugger;
       fetchSummaryFitment({
         pageNumber: 1,
         pageSize: 50,

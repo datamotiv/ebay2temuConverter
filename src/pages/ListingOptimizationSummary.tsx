@@ -93,7 +93,6 @@ const ListingOptimizationSummary = () => {
     path?: string;  
   }) => {
     try {
-      // debugger;
       const numericCategoryID = categoryID?.match(/^\d+/)?.[0] || "";
 
       const params = new URLSearchParams({
@@ -123,7 +122,6 @@ const ListingOptimizationSummary = () => {
       }
 
       const data = await response.json();
-      console.log(data, 'ha bagh kasa')
 
       if (data.categories) {
         dispatch(setSummaryFitmentCategories(data.categories));
@@ -142,7 +140,6 @@ const ListingOptimizationSummary = () => {
   };
 
    useEffect(() => {
-      debugger;
       fetchSummaryFitment({
         pageNumber: 1,
         pageSize: 50,

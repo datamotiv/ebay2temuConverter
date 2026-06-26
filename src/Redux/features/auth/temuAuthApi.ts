@@ -50,6 +50,10 @@ export const temuAuthApi = createApi({
       query: (body) => ({ url: '/profile', method: 'PATCH', body }),
       invalidatesTags: ['Profile'],
     }),
+    // POST /signup/resend-verification — re-sends the verification link.
+    resendVerification: builder.mutation<any, { email: string }>({
+      query: (body) => ({ url: '/signup/resend-verification', method: 'POST', body }),
+    }),
   }),
 });
 
@@ -61,4 +65,5 @@ export const {
   useResetPasswordTemuMutation,
   useGetProfileQuery,
   useUpdateProfileMutation,
+  useResendVerificationMutation,
 } = temuAuthApi;

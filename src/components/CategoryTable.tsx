@@ -138,7 +138,6 @@ setFitmentFilterOne
 
 
     const handleFitmentFilterChange = (event:any) => {
-      //debugger;
       const selectedFilter = event.target.value as number;
       setFitmentFilter(selectedFilter); // Update fitmentFilter in the parent (CategoryDetails)
       setFitmentFilterOne(selectedFilter)

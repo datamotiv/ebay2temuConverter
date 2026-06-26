@@ -149,7 +149,6 @@ const handleSelectAll = () => {
 
 
 const handleOptimizationChange = (listingId:number | string, option:string) => {
-  // debugger;
   const key = String(listingId);
   setOptimizationSelections((prev) => {
     const existing = prev[key] || [];
@@ -158,7 +157,6 @@ const handleOptimizationChange = (listingId:number | string, option:string) => {
       : [...existing, option];
     return { ...prev, [key]: updated };
   });
-  // console.log(optimizationSelections, 'testddta')
 };
 
   return (

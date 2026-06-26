@@ -95,9 +95,7 @@ const [snackbarSeverity, setSnackbarSeverity] =
     "success"
   );
 
-  // console.log(listings, 'bgh na');
 
-  // console.log(optimizationSelections, "testddta");
 
   // const handleCheckout = () => {
   //   setOpen(true); // open the dialog instead of redirecting
@@ -122,7 +120,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
   //     // const result = await acceptOptimize({
   //     //   searchId: optimizeRequestId,
   //     // }).unwrap();
-  //     // console.log(result);
   //   } catch (error) {
   //     console.error("Error optimizing:", error);
   //   }
@@ -146,7 +143,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
       setBodyItems(data || []);
       const totalItems = data.totalItems || data.length;
       setTotalPages(Math.ceil(totalItems / pageSize));
-      // console.log(data, 'checimjh dat')
     }
   }, [data, isSuccess]);
 
@@ -179,7 +175,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
   // };
 
   // const handleOptimizeAll = async () => {
-  //   debugger;
   //   try {
   //     const result = await optimizeFitment({
   //       all: true,
@@ -212,11 +207,9 @@ const [snackbarSeverity, setSnackbarSeverity] =
   // };
 
   const handleCheckout = async () => {
-    // debugger;
 
     try {
       const token = localStorage.getItem("accessToken");
-      // console.log(token);
       const response = await fetch(
         "https://api.help-on-time.com/api/datacube/create-checkout-session",
         {
@@ -271,7 +264,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
 
   // working code and it is commented temporairly
   // const handleCheckoutForSelectedItems = async () => {
-  //   debugger;
 
   //   if (!couponCode.trim()) {
   //     setOpenCouponDialog(true);
@@ -289,16 +281,12 @@ const [snackbarSeverity, setSnackbarSeverity] =
   //       searchId: id,
   //       coupon: couponCode || null,
   //       optimizationTypes: selectedItems.reduce((acc: any, itemId: any) => {
-  //         debugger;
   //         const key = String(itemId);
   //         acc[key] = optimizationSelections[key] || [];
   //         return acc;
   //       }, {}),
   //     };
 
-  //     console.log("Selected Items:", selectedItems);
-  //     console.log("Optimization Selections:", optimizationSelections);
-  //     console.log("Payload being sent to backend:", payload); // 🔍 Log the full payload
 
   //     const response = await fetch(
   //       "https://api.help-on-time.com/api/datacube/create-checkout-session",
@@ -326,7 +314,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
   //     if (!response.ok) {
   //       throw new Error(`HTTP error! Status: ${response.status}`);
   //     }
-  //     // console.log(response, "testctat");
   //     const session = await response.json(); // Get session ID from backend
 
   //     const stripe = await stripePromise;
@@ -348,9 +335,7 @@ const [snackbarSeverity, setSnackbarSeverity] =
 
   // letst code for migratuion
   // useEffect(() => {
-  //   debugger;
   //   const validateMigration = async () => {
-  //     debugger;
 
   //     const token = localStorage.getItem("accessToken");
   //     try {
@@ -379,7 +364,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
   //         statusMap[key] = item.status;
   //       });
 
-  //       // console.log("statusMap:", statusMap);
 
   //       setBodyItems((prev: any[]) =>
   //         prev.map((item) => {
@@ -387,7 +371,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
 
   //           const status = statusMap[key];
 
-  //           // console.log("MATCHING →", {
   //           //   key,
   //           //   status,
   //           // });
@@ -398,8 +381,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
   //           };
   //         }),
   //       );
-  //       // console.log("API response:", data);
-  //       //     console.log("API body:", bodyItems);
   //     } catch (error) {
   //       console.error("Error calling API:", error);
   //     }
@@ -471,7 +452,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
 }, [bodyItems.length]);
 
   // useEffect(() => {
-  //     debugger;
   //   if (!listings.length) return;
 
   //   const validateMigration = async () => {
@@ -505,8 +485,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
 
   //       setValidationListingStatus(statusMap); // ✅ store clean data
 
-  //       console.log("Status Map:", statusMap);
-  //       console.log("API response:", data);
   //     } catch (error) {
   //       console.error(error);
   //     }
@@ -521,7 +499,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
         const newItems = listings.filter(
           (newItem: any) => !prev.some((item: any) => item.id === newItem.id),
         );
-        // console.log(tableData, 'tatbel')
         return [...newItems, ...prev];
       });
     }
@@ -536,7 +513,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
 
   // api for sending migration
   const submitMigration = async () => {
-    debugger;
     const token = localStorage.getItem("accessToken");
 
     // Get saved accounts
@@ -570,7 +546,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
           })),
         }),
       });
-      // console.log(selectedItems, 'check item mig')
       // ❗ handle non-200 responses
       if (!response.ok) {
         const errorData = await response.json();
@@ -579,7 +554,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
 
       const data = await response.json();
       // const migrationId = data?.migrationId;
-      console.log(data, "migatte ");
       return data; // should contain migrationId
     } catch (error) {
       console.error("Migration submit error:", error);
@@ -594,7 +568,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
       // ✅ call submit API
       const res = await submitMigration();
 
-      console.log("Submit response:", res);
 
       const migrationId = res?.migrationId;
 
@@ -602,7 +575,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
         console.error("migrationId not found");
         return;
       }
-      debugger;
       // ✅ migrationId here
       setStoreMigrationId(migrationId);
       localStorage.setItem("migrationId", migrationId);
@@ -625,7 +597,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
   //polling API
   const getMigrationStatus = async (migrationId: string) => {
     const token = localStorage.getItem("accessToken");
-    debugger;
     const response = await fetch(
       `${import.meta.env.VITE_LOCAL_TEMU_BASE_URL}/api/v1/migrations/${migrationId}`, // ✅ USED HERE
       {
@@ -642,12 +613,10 @@ const [snackbarSeverity, setSnackbarSeverity] =
 
   //polling function
   const startPolling = (migrationId: string) => {
-    debugger;
     const interval = setInterval(async () => {
       try {
         const data = await getMigrationStatus(migrationId);
 
-        console.log("Polling:", data);
 
         const status = data?.status;
 
@@ -657,7 +626,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
           status === "PARTIAL_FAILED"
         ) {
           clearInterval(interval);
-          console.log("Final Status:", status);
         }
       } catch (error) {
         console.error(error);
@@ -702,7 +670,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
     try {
       const migrations = await getAllMigrations();
 
-      console.log("Migrations:", migrations);
 
       if (migrations.length === 0) {
         console.warn("No migration jobs found");
@@ -723,7 +690,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
 
   // fetch templates
   const fetchShippingTemplates = async () => {
-    debugger;
     try {
       const token = localStorage.getItem("accessToken");
       setLoading(true);
@@ -742,7 +708,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
 
       const data = await response.json();
 
-      console.log("API Response fetch template:", data);
  setTemplates(data.templates || []);
       if (data.selectedShippingTemplate) {
       setSelectedTemplate(
@@ -793,7 +758,6 @@ const [snackbarSeverity, setSnackbarSeverity] =
 const handleTemplateSelect = async (
   template: ShippingTemplate
 ) => {
-  debugger;
   try {
     const token = localStorage.getItem("accessToken");
 

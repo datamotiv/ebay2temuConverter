@@ -61,7 +61,6 @@ const ListingOptimizationCategoryDetails = () => {
 
 
 
-  // console.log(optimizationSelections, "testddta");
 
   // const handleCheckout = () => {
   //   setOpen(true); // open the dialog instead of redirecting
@@ -86,7 +85,6 @@ const ListingOptimizationCategoryDetails = () => {
   //     // const result = await acceptOptimize({
   //     //   searchId: optimizeRequestId,
   //     // }).unwrap();
-  //     // console.log(result);
   //   } catch (error) {
   //     console.error("Error optimizing:", error);
   //   }
@@ -138,7 +136,6 @@ const ListingOptimizationCategoryDetails = () => {
   // };
 
   // const handleOptimizeAll = async () => {
-  //   debugger;
   //   try {
   //     const result = await optimizeFitment({
   //       all: true,
@@ -171,11 +168,9 @@ const ListingOptimizationCategoryDetails = () => {
   // };
 
   const handleCheckout = async () => {
-    // debugger;
 
     try {
       const token = localStorage.getItem("accessToken");
-      // console.log(token);
       const response = await fetch(
         "https://api.help-on-time.com/api/datacube/create-checkout-session",
         {
@@ -231,7 +226,6 @@ const ListingOptimizationCategoryDetails = () => {
 
   // working code and it is commented temporairly
   const handleCheckoutForSelectedItems = async () => {
-    debugger;
 
    if (!couponCode.trim()) {
     setOpenCouponDialog(true);
@@ -249,16 +243,12 @@ const ListingOptimizationCategoryDetails = () => {
         searchId: id,
         coupon: couponCode || null,
         optimizationTypes: selectedItems.reduce((acc: any, itemId: any) => {
-          debugger;
           const key = String(itemId);
           acc[key] = optimizationSelections[key] || [];
           return acc;
         }, {}),
       };
 
-      console.log("Selected Items:", selectedItems);
-      console.log("Optimization Selections:", optimizationSelections);
-      console.log("Payload being sent to backend:", payload); // 🔍 Log the full payload
 
       const response = await fetch(
         "https://api.help-on-time.com/api/datacube/create-checkout-session",
@@ -286,7 +276,6 @@ const ListingOptimizationCategoryDetails = () => {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      console.log(response, "testctat");
       const session = await response.json(); // Get session ID from backend
 
       const stripe = await stripePromise;
@@ -308,7 +297,6 @@ const ListingOptimizationCategoryDetails = () => {
 
   // letst code for migratuion 
 //  const validateMigration = async () => {
-//   debugger;
 //   try {
 //     const response = await fetch(
 //       `http://localhost:4000/api/v1/migrations/validate?sellerId=${1}`,
@@ -326,7 +314,6 @@ const ListingOptimizationCategoryDetails = () => {
 //     );
 
 //     const data = await response.json();
-//     console.log("API response:", data);
 //   } catch (error) {
 //     console.error("Error calling API:", error);
 //   }

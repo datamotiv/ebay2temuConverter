@@ -52,11 +52,26 @@ const MigrateSuccessPage = () => {
     })();
   }, [sessionId, createMigration, navigate]);
 
+  const [countdown, setCountdown] = useState(5);
+
   useEffect(() => {
     if (stage !== "success") return;
-    const t = setTimeout(() => navigate("/dashboard"), 5000);
-    return () => clearTimeout(t);
-  }, [stage, navigate]);
+    const dest = migrationId
+      ? `/dashboard?tab=migrations&highlight=${migrationId}`
+      : "/dashboard";
+    setCountdown(5);
+    const interval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          navigate(dest);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [stage, navigate, migrationId]);
 
   if (stage === "processing") {
     return (
@@ -83,9 +98,15 @@ const MigrateSuccessPage = () => {
             <p className="mt-1 text-[13px] text-[#94A3B8]">Migration ID: {migrationId}</p>
           )}
         </div>
-        <p className="text-[13px] text-[#94A3B8]">Redirecting to dashboard in 5 seconds…</p>
+        <p className="text-[13px] text-[#94A3B8]">Redirecting to your migration in {countdown} second{countdown !== 1 ? 's' : ''}…</p>
         <button
-          onClick={() => navigate("/dashboard")}
+          onClick={() =>
+            navigate(
+              migrationId
+                ? `/dashboard?tab=migrations&highlight=${migrationId}`
+                : "/dashboard"
+            )
+          }
           className="rounded-lg bg-[#1D4ED8] px-6 py-2.5 text-[15px] font-semibold text-white transition hover:bg-[#1A45BE]"
         >
           Go to Dashboard

@@ -55,7 +55,6 @@ const EbaySearchHistory = () => {
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
-          // console.log(totalResults)
         });
     } else {
       getOtherSearchData({

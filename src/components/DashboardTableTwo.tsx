@@ -78,11 +78,9 @@ const DashboardTableTwo = ({ bodyItems, headerItems }: TTableProps) => {
           : label === "Action"
           ? ({ row }: { row: { original: TableRow } }) => {
               const { action, id } = row.original;
-              // console.log(action, 'teake ctao')
               const [showDialog, setShowDialog] = useState(false);
               const [file, setFile] = useState<File | null>(null);
               const isAdmin = localStorage.getItem("isAdmin") === 'true' ? true : false;
-              // console.log(isAdmin);
               
               const [uploadMessage, setUploadMessage] = useState<string | null>(
                 null
@@ -92,7 +90,6 @@ const DashboardTableTwo = ({ bodyItems, headerItems }: TTableProps) => {
 
               // api call for approval
               const handleApprove = async () => {
-                // debugger;
                 try {
                   const token = localStorage.getItem("accessToken");
                   const timestamp = Date.now();
@@ -127,7 +124,6 @@ const DashboardTableTwo = ({ bodyItems, headerItems }: TTableProps) => {
               const handleFileChange = async (
                 e: React.ChangeEvent<HTMLInputElement>
               ) => {
-                // debugger;
                 const selectedFile = e.target.files?.[0];
                 if (!selectedFile) return;
 

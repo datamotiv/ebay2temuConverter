@@ -19,7 +19,7 @@ const PaymentModal = ({
   onConfirm: () => void;
   isSubmitting: boolean;
 }) => {
-  const { rate, total } = calcMigrationCost(count);
+  const { breakdown, marginalRate, total } = calcMigrationCost(count);
 
   return (
     <Dialog
@@ -57,21 +57,21 @@ const PaymentModal = ({
 
         {/* Cost summary */}
         <div className="mt-6 rounded-xl border border-[#E5E7EB] bg-[#F8FAFC] p-5">
-          <div className="flex items-center justify-between text-[15px] text-[#334155]">
-            <span>Ready listings</span>
-            <span className="font-semibold">{count.toLocaleString()}</span>
-          </div>
-          <div className="mt-2 flex items-center justify-between text-[15px] text-[#334155]">
-            <span>Rate per listing</span>
-            <span className="font-semibold">{formatGBP(rate)}</span>
-          </div>
+          {breakdown.map((band, i) => (
+            <div
+              key={band.label}
+              className={`flex items-center justify-between text-[14px] text-[#334155] ${i > 0 ? "mt-2" : ""}`}
+            >
+              <span>
+                {band.qty.toLocaleString()} listing{band.qty !== 1 ? "s" : ""}
+                <span className="ml-1.5 text-[#94A3B8]">@ {formatGBP(band.rate)}</span>
+              </span>
+              <span className="font-medium">{formatGBP(band.subtotal)}</span>
+            </div>
+          ))}
           <div className="mt-4 border-t border-[#E5E7EB] pt-4 flex items-center justify-between">
-            <span className="text-[15px] font-semibold text-[#0F172A]">
-              Total
-            </span>
-            <span className="text-[24px] font-bold text-[#1D4ED8]">
-              {formatGBP(total)}
-            </span>
+            <span className="text-[15px] font-semibold text-[#0F172A]">Total</span>
+            <span className="text-[24px] font-bold text-[#1D4ED8]">{formatGBP(total)}</span>
           </div>
         </div>
 
@@ -82,7 +82,7 @@ const PaymentModal = ({
           </p>
           <div className="space-y-1.5">
             {PRICING_TIERS.map((tier) => {
-              const active = tier.rate === rate;
+              const active = tier.rate === marginalRate;
               return (
                 <div
                   key={tier.label}

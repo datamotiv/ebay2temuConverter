@@ -41,7 +41,6 @@ const FilterData: React.FC<FilterDataProps> = ({
   //       site: selectedSite,
   //       categoryID: category || selectedCategory,
   //     }).unwrap();
-  //     // console.log("Fitment Score:", response.fitmentScore);
   //     // // dispatch(setFitmentScore(response.fitmentScore));
   //     // dispatch(setCountryFitmentScore(response.fitmentScore));
   //     if (category) {
@@ -55,7 +54,6 @@ const FilterData: React.FC<FilterDataProps> = ({
   // };
 
   const handleFlagChange = (e: any) => {
-    //debugger;
     const newFlagValue = e.value;
     const flagLevel = -1;
     dispatch(setSelectedSite(newFlagValue)); // ✅ Store selected site

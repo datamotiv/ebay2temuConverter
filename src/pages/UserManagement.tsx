@@ -18,7 +18,6 @@ const UserManagement = () => {
 	});
 
 	const handleSearch = (searchValue: string) => {
-		console.log("Search Value:", searchValue);
 	};
 
 	return (

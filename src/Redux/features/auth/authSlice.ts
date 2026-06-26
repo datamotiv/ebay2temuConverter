@@ -39,15 +39,13 @@ const authSlice = createSlice({
     },
     setAccessToken: (state, action) => {
       const { accessToken } = action?.payload;
-      // console.log(action.payload.admin)
       // Saving user data
       state.user = action?.payload;
       // Saving login credientials
       localStorage.setItem("accessToken", accessToken);
       state.isAdmin = action.payload.admin;
       state.sellerId= action.payload.id;
-        // localStorage.setItem("id", String(id)); 
-      // console.log(action?.payload);
+      localStorage.setItem("id", String(action.payload.id));
     },
     resetState: () => initialState, 
   },

@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 // so routes are referenced as /v1/... (matches the working accounts/summary call).
 export const migrationsApi = createApi({
   reducerPath: "ebay2temuMigrations",
-  tagTypes: ["Migrations", "MigrationItems", "ShippingTemplate"],
+  tagTypes: ["Migrations", "MigrationItems", "ShippingTemplate", "AccountsSummary"],
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_LOCAL_TEMU_BASE_URL,
     prepareHeaders: (headers) => {
@@ -114,6 +114,53 @@ export const migrationsApi = createApi({
       }),
       invalidatesTags: ["ShippingTemplate"],
     }),
+
+    // GET /v1/auth/accounts/summary — linked marketplace accounts for current user.
+    getAccountsSummary: builder.query<
+      {
+        accounts: {
+          accountId: number;
+          sellerId: number | null;
+          provider: "EBAY" | "TEMU";
+          name: string | null;
+          status: string | null;
+        }[];
+      },
+      void
+    >({
+      query: () => ({ url: "/v1/auth/accounts/summary" }),
+      providesTags: ["AccountsSummary"],
+    }),
+
+    // GET /v1/dashboard/listings — paginated eBay listings with category info.
+    listDashboardListings: builder.query<
+      {
+        data: {
+          id: number;
+          itemId: string | null;
+          title: string | null;
+          categoryId: number | null;
+          categoryTitle: string | null;
+          price: string | null;
+          currency: string | null;
+          picture: string | null;
+          sku: string | null;
+          listingActive: boolean;
+          listingStatus: string | null;
+          hasFitments: boolean;
+          fitmentCount: number | null;
+          listedAt: string | null;
+          optimizationPercent: number | null;
+        }[];
+        meta: { total: number; page: number; limit: number; pageCount: number };
+      },
+      { limit?: number; page?: number; search?: string; categoryId?: number; listingStatus?: string; hasFitments?: boolean }
+    >({
+      query: ({ limit = 500, page = 1, ...rest }) => ({
+        url: "/v1/dashboard/listings",
+        params: { limit, page, ...rest },
+      }),
+    }),
   }),
 });
 
@@ -125,4 +172,8 @@ export const {
   useRetryMigrationMutation,
   useShippingTemplatesQuery,
   useSelectShippingTemplateMutation,
+  useListDashboardListingsQuery,
+  useLazyListDashboardListingsQuery,
+  useGetAccountsSummaryQuery,
+  useLazyGetAccountsSummaryQuery,
 } = migrationsApi;
