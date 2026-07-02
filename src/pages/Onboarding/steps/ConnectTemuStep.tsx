@@ -7,14 +7,12 @@ import { connectTemu } from "../../../services/temuService";
 interface ConnectTemuStepProps {
   alreadyConnected: boolean;
   ebayConnected: boolean;
-  onSkip: () => void;
   onContinue: () => void;
 }
 
 const ConnectTemuStep = ({
   alreadyConnected,
   ebayConnected,
-  onSkip,
   onContinue,
 }: ConnectTemuStepProps) => {
   const [launching, setLaunching] = useState(false);
@@ -68,9 +66,7 @@ const ConnectTemuStep = ({
 
         {!ebayConnected && !alreadyConnected && (
           <div className="mt-4 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-left text-[13px] text-[#475569]">
-            <span className="font-semibold text-[#334155]">Heads up:</span> You skipped the eBay
-            connection. You can still connect Temu now, but migrations require
-            both stores to be linked.
+            <span className="font-semibold text-[#334155]">Note:</span> Connect your eBay store first to enable migrations.
           </div>
         )}
 
@@ -98,12 +94,9 @@ const ConnectTemuStep = ({
         )}
 
         {!alreadyConnected && (
-          <button
-            onClick={onSkip}
-            className="mt-3 w-full text-[14px] font-medium text-[#94A3B8] transition hover:text-[#64748B]"
-          >
-            Skip for now
-          </button>
+          <p className="mt-3 text-center text-[13px] text-[#94A3B8]">
+            Temu connection is required to continue.
+          </p>
         )}
       </motion.div>
     </div>

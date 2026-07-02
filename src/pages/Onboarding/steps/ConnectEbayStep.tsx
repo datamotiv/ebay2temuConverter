@@ -7,7 +7,6 @@ interface ConnectEbayStepProps {
   alreadyConnected: boolean;
   isPolling: boolean;
   onConnect: () => void;
-  onSkip: () => void;
   onContinue: () => void;
 }
 
@@ -15,7 +14,6 @@ const ConnectEbayStep = ({
   alreadyConnected,
   isPolling,
   onConnect,
-  onSkip,
   onContinue,
 }: ConnectEbayStepProps) => {
   const [launching, setLaunching] = useState(false);
@@ -102,13 +100,10 @@ const ConnectEbayStep = ({
           </button>
         )}
 
-        {!alreadyConnected && (
-          <button
-            onClick={onSkip}
-            className="mt-3 w-full text-[14px] font-medium text-[#94A3B8] transition hover:text-[#64748B]"
-          >
-            Skip for now
-          </button>
+        {!alreadyConnected && !isPolling && (
+          <p className="mt-3 text-center text-[13px] text-[#94A3B8]">
+            eBay connection is required to continue.
+          </p>
         )}
       </motion.div>
     </div>

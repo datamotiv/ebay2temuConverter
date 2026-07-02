@@ -20,7 +20,6 @@ const OnboardingPage = () => {
     isPollingEbay,
     completed,
     goNext,
-    skipStep,
     startEbayPolling,
     onTemplateSelected,
     completeOnboarding,
@@ -40,20 +39,18 @@ const OnboardingPage = () => {
       alreadyConnected={completed.ebay}
       isPolling={isPollingEbay}
       onConnect={startEbayPolling}
-      onSkip={skipStep}
       onContinue={goNext}
     />,
     <ConnectTemuStep
       alreadyConnected={completed.temu}
       ebayConnected={completed.ebay}
-      onSkip={skipStep}
       onContinue={goNext}
     />,
     <ShippingTemplateStep
       alreadySelected={completed.shipping}
       temuConnected={completed.temu}
       onSave={onTemplateSelected}
-      onSkip={skipStep}
+      onSkip={goNext}
     />,
     <DoneStep onComplete={completeOnboarding} />,
   ];
